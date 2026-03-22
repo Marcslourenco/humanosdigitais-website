@@ -349,7 +349,9 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .recursos-header .subtitulo { color: #475569; font-size: 1.05rem; }
 .recursos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
 .recurso-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(26,86,219,0.08); }
-.recurso-icon { font-size: 2rem; margin-bottom: 12px; }
+.recurso-icon { font-size: 2rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; height: 72px; width: 72px; }
+.recurso-icon img { height: 72px; width: 72px; object-fit: contain; }
+.recurso-icon .recurso-emoji { display: none; }
 .recurso-tag { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.05em; }
 .recurso-card h3 { font-size: 1rem; font-weight: 700; color: #0A2A44; margin-bottom: 8px; }
 .recurso-card p { font-size: 0.88rem; color: #475569; line-height: 1.6; }
@@ -461,7 +463,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .pagamentos-nota { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
 /* DEMONSTRAÇÃO */
 .demo-section { background: linear-gradient(135deg, #0A0F1C, #1e3a5f); padding: 80px 8%; position: relative; z-index: 10; }
-.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
 .demo-text h2 { font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 12px; line-height: 1.2; }
 .demo-text .subtitle { color: #93c5fd; font-size: 1.05rem; margin-bottom: 32px; }
 .steps-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
@@ -630,9 +632,9 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
         <div class="subtitulo">Os recursos que fazem nossos humanos digitais serem únicos no mercado.</div>
       </div>
       <div class="recursos-grid">
-        <div class="recurso-card"><div class="recurso-icon">🧠</div><span class="recurso-tag">BASE DE CONHECIMENTO</span><h3>Aprende tudo sobre o seu negócio.</h3><p>Nossa tecnologia RAG treina o humano digital com os PDFs, documentos, catálogos e informações da sua empresa. Em minutos ele conhece seus produtos melhor que qualquer atendente recém-contratado.</p></div>
-        <div class="recurso-card"><div class="recurso-icon">👁️</div><span class="recurso-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Age no momento certo. Sem esperar ser chamado.</h3><p>Nosso sistema detecta qual página o visitante está navegando e aborda com a mensagem certa no momento ideal.</p></div>
-        <div class="recurso-card"><div class="recurso-icon">📊</div><span class="recurso-tag">GERAÇÃO DE LEADS</span><h3>Transforma conversas em oportunidades.</h3><p>Cada interação pode capturar dados do visitante. Leads qualificados entram automaticamente no seu CRM ou chegam via WhatsApp para sua equipe comercial.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Base de Conhecimento" /><span class="recurso-emoji">🧠</span></div><span class="recurso-tag">BASE DE CONHECIMENTO</span><h3>Aprende tudo sobre o seu negócio.</h3><p>Nossa tecnologia RAG treina o humano digital com os PDFs, documentos, catálogos e informações da sua empresa. Em minutos ele conhece seus produtos melhor que qualquer atendente recém-contratado.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Inteligência Contextual" /><span class="recurso-emoji">👁️</span></div><span class="recurso-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Age no momento certo. Sem esperar ser chamado.</h3><p>Nosso sistema detecta qual página o visitante está navegando e aborda com a mensagem certa no momento ideal.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Geração de Leads" /><span class="recurso-emoji">📊</span></div><span class="recurso-tag">GERAÇÃO DE LEADS</span><h3>Transforma conversas em oportunidades.</h3><p>Cada interação pode capturar dados do visitante. Leads qualificados entram automaticamente no seu CRM ou chegam via WhatsApp para sua equipe comercial.</p></div>
         <div class="recurso-card"><div class="recurso-icon">📈</div><span class="recurso-tag">ANALYTICS</span><h3>Cada pergunta é um dado valioso.</h3><p>Veja em tempo real o que seus visitantes perguntam, onde duvidam e quais produtos mais interessam. Inteligência de negócio que nenhum formulário consegue capturar.</p></div>
         <div class="recurso-card"><div class="recurso-icon">🔌</div><span class="recurso-tag">INTEGRAÇÕES</span><h3>Conecta com o que você já usa.</h3><p>Integração nativa com CRM (HubSpot, Pipedrive, RD Station), WhatsApp Business API, Google Analytics e os principais sistemas do mercado.</p></div>
         <div class="recurso-card"><div class="recurso-icon">🌐</div><span class="recurso-tag">13 IDIOMAS</span><h3>Fala com qualquer visitante. Em qualquer idioma.</h3><p>Inglês, Espanhol, Francês, Alemão, Italiano, Japonês, Mandarim, Árabe e mais 5 idiomas. Ideal para aeroportos, hotéis e plataformas internacionais.</p></div>
@@ -827,7 +829,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     <div class="demo-visual" id="demoSofiaVisual">
       <img src="./assets/avatares/estaticas/01-sofia-principal.png"
            alt="Sofia — Host da plataforma"
-           style="width:100%;height:100%;object-fit:cover;border-radius:20px;"
+           style="width:100%;height:100%;object-fit:cover;object-position:top center;border-radius:20px;display:block;"
            onerror="this.style.display='none';this.nextSibling.style.display='flex';">
       <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:8rem;font-weight:700;color:white;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#06b6d4);">S</div>
     </div>
