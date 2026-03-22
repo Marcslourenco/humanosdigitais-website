@@ -1,11 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "echo 'Static HTML - no build needed'",
-  "outputDirectory": ".",
   "public": true,
+  "buildCommand": "echo 'Static HTML deployment'",
+  "outputDirectory": ".",
+  "framework": null,
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/(?!assets).*",
       "dest": "/index.html"
     }
   ]
