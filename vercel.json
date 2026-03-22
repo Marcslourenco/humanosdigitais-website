@@ -1,17 +1,15 @@
 {
   "version": 2,
-  "public": true,
-  "buildCommand": "echo 'Static HTML deployment'",
-  "outputDirectory": ".",
-  "framework": null,
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
   "routes": [
     {
-      "src": "^/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "^/(?!assets).*",
-      "dest": "/index.html"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
