@@ -936,15 +936,36 @@ function resetAutoReturnTimer() {
 function updateSelectedAvatar(index) {
   selectedAvatarIndex = index;
   const avatar = avatars[index];
-  avatarLarge.textContent = avatar.initials;
-  avatarLarge.style.background = avatar.color;
+  
+  // Avatar grande central - usar imagem principal
+  const imgEl = document.getElementById('avatarLarge');
+  imgEl.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = avatar.principal;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;';
+  img.onerror = () => {
+    imgEl.textContent = avatar.initials;
+    imgEl.style.background = avatar.color;
+  };
+  imgEl.appendChild(img);
+  
   avatarName.textContent = avatar.name;
   avatarRole.textContent = avatar.role;
   floatAvatarIcon.textContent = avatar.initials;
   floatAvatarName.textContent = avatar.name;
   floatAvatarRole.textContent = avatar.shortRole;
-  floatPlaceholderLetter.textContent = avatar.initials;
-  floatAvatarPlaceholder.style.background = avatar.color;
+  
+  // Widget canto inferior direito - usar imagem synclip
+  const floatImg = document.getElementById('floatAvatarPlaceholder');
+  floatImg.innerHTML = '';
+  const fImg = document.createElement('img');
+  fImg.src = avatar.synclip;
+  fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+  fImg.onerror = () => {
+    floatImg.textContent = avatar.initials;
+    floatImg.style.background = avatar.color;
+  };
+  floatImg.appendChild(fImg);
   // Saudação no widget — sem quick replies no widget
   if (!ctaModeActive) {
     saudacaoMsg.textContent = avatar.saudacao;
@@ -954,7 +975,21 @@ function updateSelectedAvatar(index) {
   mostrarPerguntasMainArea(avatar);
   if (index !== 0) demoBadge.classList.add('active');
   else { demoBadge.classList.remove('active'); if (!ctaModeActive) limparQuickReplies(); }
+  // Thumbnails do grid - usar imagens principais
   document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
+    const av = avatars[i];
+    const thumbContainer = btn.querySelector('.thumbnail-avatar');
+    if (thumbContainer) {
+      thumbContainer.innerHTML = '';
+      const t = document.createElement('img');
+      t.src = av.principal;
+      t.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;';
+      t.onerror = () => {
+        thumbContainer.textContent = av.initials;
+        thumbContainer.style.background = av.color;
+      };
+      thumbContainer.appendChild(t);
+    }
     if (i === index) { btn.classList.add('selected'); btn.querySelector('.thumbnail-name').style.color = '#1a1a1a'; }
     else { btn.classList.remove('selected'); btn.querySelector('.thumbnail-name').style.color = '#6b7280'; }
   });
