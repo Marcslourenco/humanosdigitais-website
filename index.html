@@ -1,4 +1,3 @@
-file:///C:/Users/User/Downloads/humanos_digitais_v11.html 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,10 +7,11 @@ file:///C:/Users/User/Downloads/humanos_digitais_v11.html
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0A2A44; color: #1a1a1a; line-height: 1.5; overflow-x: hidden; }
+
 /* HEADER */
 .header { position: fixed; top: 0; left: 0; right: 0; background: black; color: white; padding: 0 5%; height: 80px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
 .logo-container { display: flex; align-items: center; gap: 12px; }
-.logo-icon { display: none; }
+.logo-icon { width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
 .logo-text { display: flex; flex-direction: column; }
 .logo-text span { font-size: 1.1rem; font-weight: 700; color: white; line-height: 1.1; }
 .nav-links { display: flex; align-items: center; gap: 28px; }
@@ -19,6 +19,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .nav-links a:hover { opacity: 0.7; }
 .cta-button { background: white; color: black !important; padding: 10px 20px; border-radius: 999px; font-weight: 700 !important; transition: background 0.3s, color 0.3s !important; }
 .cta-button:hover { background: #22c55e !important; color: white !important; opacity: 1 !important; }
+
 /* ============================================
    AVATAR FLUTUANTE — tamanho original 200px
    ============================================ */
@@ -98,6 +99,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .input-actions-small { display: flex; gap: 3px; flex-shrink: 0; }
 .input-actions-small button { width: 28px; height: 28px; border-radius: 50%; border: none; background: #4f46e5; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: background 0.2s; }
 .input-actions-small button:hover { background: #6366f1; }
+
 /* ============================================
    SEÇÃO 1 — STICKY para efeito de sobreposição
    ============================================ */
@@ -184,6 +186,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .frases-lista li::before { content: "✦"; color: #90caf9; position: absolute; left: 0; font-size: 0.9rem; }
 .cta-button-hero { display: inline-block; margin-top: 28px; padding: 10px 28px; background: white; color: #0A2A44; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 0.95rem; transition: background 0.3s; border: none; cursor: pointer; width: fit-content; max-width: fit-content; align-self: flex-start; }
 .cta-button-hero:hover { background: #e0e0e0; }
+
 /* ============================================
    PAINÉIS QUE SOBEM — z-index > section-1
    ============================================ */
@@ -209,6 +212,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .panel-header h2 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: #1a1a1a; letter-spacing: -0.02em; margin-bottom: 8px; }
 .panel-header .subtitulo { font-size: 1.3rem; color: #333; font-weight: 700; margin-bottom: 4px; }
 .panel-header .descricao { font-size: 1.1rem; color: #111; font-weight: 400; }
+
 /* GRID AVATARES */
 .two-columns { display: flex; flex-direction: row; gap: 2rem; align-items: start; }
 .thumbnails-grid { width: 50%; flex-shrink: 0; }
@@ -308,6 +312,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .pergunta-item::before { content: "💬"; font-size: 0.75rem; flex-shrink: 0; }
 .pergunta-item:hover { background: #eff6ff; border-color: #93c5fd; }
 .pergunta-item:last-child { margin-bottom: 0; }
+
 .counter-bottom-dark {
   background: #0A0F1C;
   border-radius: 0 0 0 0;
@@ -330,18 +335,21 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .card-tag { display: inline-block; background: #eff6ff; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.05em; }
 .feature-card h3 { font-size: 1.1rem; font-weight: 700; color: #0A2A44; margin-bottom: 10px; }
 .feature-card p { font-size: 0.9rem; color: #475569; line-height: 1.6; }
+
 /* SOLUÇÕES */
 .solucoes-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
 .solucoes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
 .solucao-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(26,86,219,0.08); }
-.avatar-circle { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 1.3rem; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: transform 0.2s; }
-.avatar-circle:hover { transform: scale(1.1); }
+.avatar-circle { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 1.3rem; margin-bottom: 14px; border: 3px solid white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.avatar-circle:hover { transform: scale(1.12); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
+.avatar-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
 .solucao-tag { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.05em; }
 .solucao-card h3 { font-size: 1.05rem; font-weight: 700; color: #0A2A44; margin-bottom: 8px; }
 .solucao-card p { font-size: 0.88rem; color: #475569; line-height: 1.6; }
 .solucoes-cta { text-align: center; margin-top: 8px; }
 .btn-solucoes { display: inline-block; background: #1A56DB; color: white; padding: 14px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: background 0.2s; }
 .btn-solucoes:hover { background: #1341a8; }
+
 /* RECURSOS */
 .recursos-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
 .recursos-header { text-align: center; margin-bottom: 40px; }
@@ -349,8 +357,8 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .recursos-header .subtitulo { color: #475569; font-size: 1.05rem; }
 .recursos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
 .recurso-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(26,86,219,0.08); }
-.recurso-icon { font-size: 2rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; height: 72px; width: 72px; }
-.recurso-icon img { height: 72px; width: 72px; object-fit: contain; }
+.recurso-icon { margin-bottom: 14px; display: flex; align-items: center; gap: 0; }
+.recurso-icon img { height: 72px; width: auto; object-fit: contain; opacity: 0.92; }
 .recurso-icon .recurso-emoji { display: none; }
 .recurso-tag { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.05em; }
 .recurso-card h3 { font-size: 1rem; font-weight: 700; color: #0A2A44; margin-bottom: 8px; }
@@ -360,6 +368,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .btn-primary:hover { background: #1341a8; }
 .btn-outline-light { display: inline-block; border: 2px solid #1A56DB; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; transition: all 0.2s; }
 .btn-outline-light:hover { background: #1A56DB; color: white; }
+
 /* PREÇOS */
 .precos-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
 .precos-header { text-align: center; margin-bottom: 40px; }
@@ -387,6 +396,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .cta-banner h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; }
 .cta-banner .btn-white { display: inline-block; background: white; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; margin-bottom: 12px; }
 .cta-banner p { font-size: 0.9rem; opacity: 0.8; }
+
 /* FAQ */
 .faq-section-full { width: 100%; }
 .faq-two-columns { display: grid; grid-template-columns: 40% 60%; gap: 48px; margin-bottom: 48px; }
@@ -431,6 +441,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .faq-cta .btn-white { display: inline-block; background: white; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; margin-bottom: 12px; }
 .faq-cta .small-text { font-size: 0.85rem; opacity: 0.8; }
 .faq-cta .small-text a { color: white; }
+
 /* DEMONSTRAÇÃO — Onboarding e Pagamentos */
 .onboarding-box {
   background: rgba(255,255,255,0.08);
@@ -461,6 +472,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .pagamentos-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .pay-tag { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 4px 12px; font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 600; }
 .pagamentos-nota { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+
 /* DEMONSTRAÇÃO */
 .demo-section { background: linear-gradient(135deg, #0A0F1C, #1e3a5f); padding: 80px 8%; position: relative; z-index: 10; }
 .demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
@@ -475,7 +487,8 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .btn-ligacao { display: block; width: fit-content; min-width: 200px; text-align: center; padding: 13px 28px; background: transparent; color: white; border: 2px solid white; border-radius: 999px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; }
 .btn-ligacao:hover { background: white; color: #0A0F1C; }
 .demo-nota { color: rgba(255,255,255,0.5); font-size: 0.82rem; text-align: center; margin-top: 8px; }
-.demo-visual { border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #3b82f6, #6d28d9); min-height: 400px; display: flex; align-items: center; justify-content: center; font-size: 8rem; font-weight: 700; color: white; }
+.demo-visual { border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #3b82f6, #6d28d9); min-height: 0; height: auto; aspect-ratio: 3/4; display: flex; align-items: flex-start; justify-content: center; font-size: 8rem; font-weight: 700; color: white; }
+
 @media (max-width: 768px) {
   .grid-3-cols { grid-template-columns: repeat(2, 1fr); }
   .two-columns { flex-direction: column; }
@@ -489,10 +502,14 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 </style>
 </head>
 <body>
+
 <!-- HEADER -->
 <header class="header">
   <div class="logo-container">
-    <img src="./assets/logo/logo_sem_fundo.png" alt="Humanos Digitais" style="height:42px; width:auto; object-fit:contain; border-radius:8px;">
+    <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png"
+         alt="Humanos Digitais"
+         style="height:84px;width:auto;object-fit:contain;"
+         onerror="this.outerHTML='<div class=\'logo-icon\'>👤</div>'">
     <div class="logo-text"><span>Humanos</span><span>Digitais</span></div>
   </div>
   <nav class="nav-links">
@@ -504,6 +521,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     <a href="#demonstracao" class="cta-button">Solicite uma Demonstração</a>
   </nav>
 </header>
+
 <!-- AVATAR FLUTUANTE -->
 <div class="avatar-flutuante" id="avatarFlutuante">
   <div class="avatar-header" id="avatarHeader">
@@ -532,6 +550,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </div>
+
 <!-- SEÇÃO 1 — HERO STICKY -->
 <section class="section-1">
   <div class="hero">
@@ -558,6 +577,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     <button class="cta-button-hero" onclick="abrirSofiaComCTA()">Converse com Sofia →</button>
   </div>
 </section>
+
 <!-- SEÇÃO 2 — AVATARES (painel que sobe sobre a seção 1) -->
 <section class="content-panel" id="contentPanel">
   <div class="floating-panel">
@@ -586,6 +606,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 3 — PLATAFORMA / NÚMEROS -->
 <section class="content-panel platform-section" id="plataforma">
   <div class="floating-panel">
@@ -610,6 +631,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 4 — SOLUÇÕES -->
 <section class="content-panel solucoes-section" id="solucoes">
   <div class="floating-panel">
@@ -623,6 +645,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 5 — RECURSOS -->
 <section class="content-panel recursos-section" id="recursos">
   <div class="floating-panel">
@@ -632,12 +655,12 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
         <div class="subtitulo">Os recursos que fazem nossos humanos digitais serem únicos no mercado.</div>
       </div>
       <div class="recursos-grid">
-        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Base de Conhecimento" /><span class="recurso-emoji">🧠</span></div><span class="recurso-tag">BASE DE CONHECIMENTO</span><h3>Aprende tudo sobre o seu negócio.</h3><p>Nossa tecnologia RAG treina o humano digital com os PDFs, documentos, catálogos e informações da sua empresa. Em minutos ele conhece seus produtos melhor que qualquer atendente recém-contratado.</p></div>
-        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Inteligência Contextual" /><span class="recurso-emoji">👁️</span></div><span class="recurso-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Age no momento certo. Sem esperar ser chamado.</h3><p>Nosso sistema detecta qual página o visitante está navegando e aborda com a mensagem certa no momento ideal.</p></div>
-        <div class="recurso-card"><div class="recurso-icon"><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="Geração de Leads" /><span class="recurso-emoji">📊</span></div><span class="recurso-tag">GERAÇÃO DE LEADS</span><h3>Transforma conversas em oportunidades.</h3><p>Cada interação pode capturar dados do visitante. Leads qualificados entram automaticamente no seu CRM ou chegam via WhatsApp para sua equipe comercial.</p></div>
-        <div class="recurso-card"><div class="recurso-icon">📈</div><span class="recurso-tag">ANALYTICS</span><h3>Cada pergunta é um dado valioso.</h3><p>Veja em tempo real o que seus visitantes perguntam, onde duvidam e quais produtos mais interessam. Inteligência de negócio que nenhum formulário consegue capturar.</p></div>
-        <div class="recurso-card"><div class="recurso-icon">🔌</div><span class="recurso-tag">INTEGRAÇÕES</span><h3>Conecta com o que você já usa.</h3><p>Integração nativa com CRM (HubSpot, Pipedrive, RD Station), WhatsApp Business API, Google Analytics e os principais sistemas do mercado.</p></div>
-        <div class="recurso-card"><div class="recurso-icon">🌐</div><span class="recurso-tag">13 IDIOMAS</span><h3>Fala com qualquer visitante. Em qualquer idioma.</h3><p>Inglês, Espanhol, Francês, Alemão, Italiano, Japonês, Mandarim, Árabe e mais 5 idiomas. Ideal para aeroportos, hotéis e plataformas internacionais.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🧠</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">BASE DE CONHECIMENTO</span><h3>Aprende tudo sobre o seu negócio.</h3><p>Nossa tecnologia RAG treina o humano digital com os PDFs, documentos, catálogos e informações da sua empresa. Em minutos ele conhece seus produtos melhor que qualquer atendente recém-contratado.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">👁️</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Age no momento certo. Sem esperar ser chamado.</h3><p>Nosso sistema detecta qual página o visitante está navegando e aborda com a mensagem certa no momento ideal.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">📊</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">GERAÇÃO DE LEADS</span><h3>Transforma conversas em oportunidades.</h3><p>Cada interação pode capturar dados do visitante. Leads qualificados entram automaticamente no seu CRM ou chegam via WhatsApp para sua equipe comercial.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">📈</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">ANALYTICS</span><h3>Cada pergunta é um dado valioso.</h3><p>Veja em tempo real o que seus visitantes perguntam, onde duvidam e quais produtos mais interessam. Inteligência de negócio que nenhum formulário consegue capturar.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🔌</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">INTEGRAÇÕES</span><h3>Conecta com o que você já usa.</h3><p>Integração nativa com CRM (HubSpot, Pipedrive, RD Station), WhatsApp Business API, Google Analytics e os principais sistemas do mercado.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🌐</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">13 IDIOMAS</span><h3>Fala com qualquer visitante. Em qualquer idioma.</h3><p>Inglês, Espanhol, Francês, Alemão, Italiano, Japonês, Mandarim, Árabe e mais 5 idiomas. Ideal para aeroportos, hotéis e plataformas internacionais.</p></div>
       </div>
       <div class="recursos-cta">
         <a href="#precos" class="btn-primary">Ver planos e preços →</a>
@@ -646,6 +669,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 6 — PREÇOS -->
 <section class="content-panel precos-section" id="precos">
   <div class="floating-panel">
@@ -746,6 +770,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 7 — FAQ -->
 <section class="content-panel" id="faq">
   <div class="floating-panel" style="background:#F8FAFF;">
@@ -756,7 +781,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
             <h2>Você provavelmente<br>tem algumas perguntas.</h2>
             <p>A Sofia pode responder aqui — por escrito. Ou ao vivo, pelo ícone no canto inferior direito.</p>
             <div class="sofia-image">
-              <img src="./assets/avatares/estaticas/01-sofia-principal.png"
+              <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/estaticas/01-sofia-principal.png"
                    alt="Sofia — Host da plataforma"
                    class="faq-sofia-img"
                    onerror="this.style.display='none';this.parentElement.querySelector('.sofia-fallback').style.display='flex';">
@@ -787,12 +812,14 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <!-- SEÇÃO 8 — DEMONSTRAÇÃO -->
 <section class="demo-section" id="demonstracao">
   <div class="demo-inner">
     <div class="demo-text">
       <h2>Pronto para ter um especialista digital no seu site?</h2>
       <div class="subtitle">A Sofia vai orientar você durante o teste — e já demonstra ao vivo como funciona.</div>
+
       <!-- ONBOARDING STEPS -->
       <div class="steps-list">
         <div class="step-item"><div class="step-num">1</div>🌐 Informe o site da sua empresa — Sofia aprende sobre seu negócio</div>
@@ -800,6 +827,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
         <div class="step-item"><div class="step-num">3</div>💬 A Sofia orienta e demonstra ao vivo como o avatar vai trabalhar</div>
         <div class="step-item"><div class="step-num">4</div>✅ Em 7 dias você vê o resultado real — sem cartão de crédito</div>
       </div>
+
       <!-- ONBOARDING FORM -->
       <div class="onboarding-box" id="onboardingBox">
         <div class="onboarding-titulo">Conte um pouco sobre sua empresa:</div>
@@ -812,6 +840,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
           <a href="https://wa.me/5511XXXXXXXXX?text=Quero+saber+mais+sobre+planos+e+pagamento" target="_blank" class="btn-ligacao">Falar sobre planos e pagamento</a>
         </div>
       </div>
+
       <!-- FORMAS DE PAGAMENTO -->
       <div class="pagamentos-box">
         <div class="pagamentos-titulo">Formas de pagamento aceitas:</div>
@@ -823,11 +852,13 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
         </div>
         <div class="pagamentos-nota">Sem assinatura obrigatória. Pague como preferir.</div>
       </div>
+
       <div class="demo-nota">Nosso especialista em implementação entrará em contato em até 2 horas úteis.<br>Atendemos comércio, indústria, serviços, turismo e e-commerce.</div>
     </div>
+
     <!-- SOFIA IMAGE PLACEHOLDER -->
     <div class="demo-visual" id="demoSofiaVisual">
-      <img src="./assets/avatares/estaticas/01-sofia-principal.png"
+      <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/estaticas/01-sofia-principal.png"
            alt="Sofia — Host da plataforma"
            style="width:100%;height:100%;object-fit:cover;object-position:top center;border-radius:20px;display:block;"
            onerror="this.style.display='none';this.nextSibling.style.display='flex';">
@@ -835,26 +866,29 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
     </div>
   </div>
 </section>
+
 <script>
 // ========== DADOS DOS AVATARES ==========
+const GH_BASE = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
 const avatars = [
-  { name:"Sofia", role:"Host da plataforma", shortRole:"Atendimento", genero:"feminino", color:"linear-gradient(135deg,#3b82f6,#06b6d4)", initials:"S", principal:"./assets/avatares/estaticas/01-sofia-principal.png", synclip:"./assets/avatares/synclip/01-sofia-synclip.png", saudacao:"Oi! Sou a Sofia, vamos conversar? 😊", perguntas:["O que são humanos digitais?","Como funciona no meu site?","Quais segmentos vocês atendem?","Qual a diferença para um chatbot?","Como solicitar para minha empresa?"] },
-  { name:"Rafael", role:"Especialista em Substituição Tributária", shortRole:"Tributário", genero:"masculino", color:"linear-gradient(135deg,#2563eb,#3b82f6)", initials:"R", principal:"./assets/avatares/estaticas/02-rafael-principal.png", synclip:"./assets/avatares/synclip/02-rafael-synclip.png", saudacao:"Oi! Sou o Rafael, especialista tributário. Como posso ajudar? 💼", perguntas:["O que é substituição tributária?","Como funciona o ICMS-ST?","Quais setores são afetados?","Como regularizar pendências fiscais?","Posso parcelar débitos tributários?"] },
-  { name:"Clara", role:"Consultora Hospitalar", shortRole:"Saúde", genero:"feminino", color:"linear-gradient(135deg,#10b981,#34d399)", initials:"C", principal:"./assets/avatares/estaticas/03-clara-principal.png", synclip:"./assets/avatares/synclip/03-clara-synclip.png", saudacao:"Olá! Sou a Clara, consultora hospitalar. Em que posso ajudar? 🏥", perguntas:["Quais especialidades o hospital possui?","Como agendar uma consulta?","O hospital atende convênios?","Onde fica a emergência?","Quais horários de atendimento?"] },
-  { name:"Lucas", role:"Consultor Automotivo", shortRole:"Automotivo", genero:"masculino", color:"linear-gradient(135deg,#8b5cf6,#a855f7)", initials:"L", principal:"./assets/avatares/estaticas/04-lucas-principal.png", synclip:"./assets/avatares/synclip/04-lucas-synclip.png", saudacao:"E aí! Sou o Lucas, consultor automotivo. Bora conversar? 🚗", perguntas:["Qual a diferença entre os modelos?","Tem financiamento disponível?","Qual o consumo do veículo?","Posso agendar um test drive?","Vocês aceitam carro na troca?"] },
-  { name:"Amanda", role:"Recepcionista de Hotel", shortRole:"Hotelaria", genero:"feminino", color:"linear-gradient(135deg,#f59e0b,#fbbf24)", initials:"A", principal:"./assets/avatares/estaticas/05-amanda-principal.png", synclip:"./assets/avatares/synclip/05-amanda-synclip.png", saudacao:"Olá! Sou a Amanda, recepcionista. Bem-vindo, como posso ajudar? 🏨", perguntas:["Quais acomodações estão disponíveis?","Como fazer check-in?","O hotel tem restaurante?","Tem estacionamento?","Qual o horário do café da manhã?"] },
-  { name:"Fernanda", role:"Atendente Municipal", shortRole:"Municipal", genero:"feminino", color:"linear-gradient(135deg,#6366f1,#818cf8)", initials:"F", principal:"./assets/avatares/estaticas/06-fernanda-principal.png", synclip:"./assets/avatares/synclip/06-fernanda-synclip.png", saudacao:"Olá! Sou a Fernanda, atendente municipal. O que precisa? 🏛", perguntas:["Como emitir segunda via do IPTU?","Onde fica a secretaria de saúde?","Como abrir um protocolo?","Quais horários de atendimento?","Como solicitar alvará?"] },
-  { name:"Marina", role:"Atendente de Shopping", shortRole:"Varejo", genero:"feminino", color:"linear-gradient(135deg,#f43f5e,#f472b6)", initials:"M", principal:"./assets/avatares/estaticas/07-marina-principal.png", synclip:"./assets/avatares/synclip/07-marina-synclip.png", saudacao:"Oi! Sou a Marina, seu guia no shopping. Posso ajudar? 🛍", perguntas:["Onde fica a loja X?","Quais restaurantes têm aqui?","Como chegar ao estacionamento?","Tem alguma promoção hoje?","Onde fica a praça de alimentação?"] },
-  { name:"Roberto", role:"Consultor de Energia Solar", shortRole:"Energia", genero:"masculino", color:"linear-gradient(135deg,#f97316,#fb923c)", initials:"R", principal:"./assets/avatares/estaticas/08-roberto-principal.png", synclip:"./assets/avatares/synclip/08-roberto-synclip.png", saudacao:"Oi! Sou o Roberto. Vamos falar sobre energia solar? ☀️", perguntas:["Qual a economia com energia solar?","Quanto tempo leva a instalação?","Posso financiar o sistema?","Qual o retorno do investimento?","Funciona em dias nublados?"] },
-  { name:"Luisa", role:"Mentora Educacional", shortRole:"Educação", genero:"feminino", color:"linear-gradient(135deg,#059669,#10b981)", initials:"L", principal:"./assets/avatares/estaticas/09-luisa-principal.png", synclip:"./assets/avatares/synclip/09-luisa-synclip.png", saudacao:"Olá! Sou a Luisa, mentora educacional. Qual sua dúvida? 🎓", perguntas:["Quais cursos estão disponíveis?","Como é o processo de inscrição?","Existem bolsas de estudo?","Como funciona o EAD?","Qual o valor da mensalidade?"] },
-  { name:"Laís", role:"Orientadora Acadêmica — Medicina", shortRole:"Medicina", genero:"feminino", color:"linear-gradient(135deg,#0891b2,#06b6d4)", initials:"L", principal:"./assets/avatares/estaticas/10-lais-principal.png", synclip:"./assets/avatares/synclip/10-lais-synclip.png", saudacao:"Oi! Sou a Laís, orientadora de medicina. Vamos conversar? 🩺", perguntas:["Como funciona o internato médico?","Quais especialidades disponíveis?","Como me preparar para a residência?","O que é o CRM médico?","Qual a diferença entre clínica e cirurgia?"] },
-  { name:"Paula", role:"Atendente Odontológica", shortRole:"Odontologia", genero:"feminino", color:"linear-gradient(135deg,#ec4899,#f472b6)", initials:"P", principal:"./assets/avatares/estaticas/11-paula-principal.png", synclip:"./assets/avatares/synclip/11-paula-synclip.png", saudacao:"Olá! Sou a Paula, atendente odontológica. Como posso ajudar? 😁", perguntas:["Quais tratamentos estão disponíveis?","Vocês atendem convênios?","Como agendar uma consulta?","Quanto custa um clareamento?","Vocês fazem implantes?"] },
-  { name:"Bruno", role:"Tricolouco — Torcedor Fanático do São Paulo", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#dc2626,#b91c1c)", initials:"B", principal:"./assets/avatares/estaticas/12-bruno-principal.png", synclip:"./assets/avatares/synclip/12-bruno-synclip.png", saudacao:"E aí, tricolor! Sou o Bruno, Tricolouco! Bora falar de futebol? ⚽", perguntas:["Como foi o último jogo do SPFC?","Qual o melhor jogador do time?","Quando é o próximo clássico?","Qual a história do São Paulo?","Me conta uma curiosidade do clube?"] },
-  { name:"Giovana", role:"Tricolinda — Torcedora Apaixonada do São Paulo", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#be185d,#ec4899)", initials:"G", principal:"./assets/avatares/estaticas/13-giovana-principal.png", synclip:"./assets/avatares/synclip/13-giovana-synclip.png", saudacao:"Oi! Sou a Giovana, Tricolinda e apaixonada pelo São Paulo! 🔴⚪🔵", perguntas:["Qual o título mais importante do SPFC?","Quem é a lenda do clube?","Quando foi fundado o São Paulo?","Como é o Morumbi?","Me fala do Rogério Ceni?"] },
-  { name:"Marcos", role:"Fiel da ZL — Torcedor Corinthiano", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#111827,#374151)", initials:"M", principal:"./assets/avatares/estaticas/14-marcos-principal.png", synclip:"./assets/avatares/synclip/14-marcos-synclip.png", saudacao:"Salve Fiel! Sou o Marcos, corinthiano da ZL! Pode falar! 🖤🤍", perguntas:["Como foi o Mundial do Corinthians?","Quem é o maior ídolo da Fiel?","Qual o maior rival do Timão?","Me conta sobre a Neo Química Arena?","Qual o hino do Corinthians?"] },
-  { name:"Carol", role:"Bandona — Torcedora Corinthiana", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#1f2937,#4b5563)", initials:"C", principal:"./assets/avatares/estaticas/15-carol-principal.png", synclip:"./assets/avatares/synclip/15-carol-synclip.png", saudacao:"Oi! Sou a Carol, Bandona e Fiel até o fim! Vamos torcer juntos? 🖤🤍", perguntas:["Qual o título mais emocionante do Corinthians?","Como surgiu a Fiel Torcida?","Quem são as lendas femininas do clube?","Me fala da conquista da Libertadores?","O que significa ser corintiano?"] },
-  { name:"Sua Empresa", role:"Comércio · Indústria · Serviços · Turismo · E-commerce", shortRole:"Personalizado", genero:"neutro", color:"linear-gradient(135deg,#1A56DB,#3b82f6)", initials:"★", principal:"./assets/avatares/estaticas/20-ingles-principal.png", synclip:"./assets/avatares/synclip/20-ingles-synclip.png", saudacao:"Olá! Posso mostrar como um humano digital pode transformar sua empresa. Vamos conversar? 🚀", perguntas:["Que tipo de empresa pode ter um humano digital?","Como personalizo o avatar para minha marca?","Quanto tempo leva a implementação?","Funciona para e-commerce também?","Como solicitar uma demonstração?"] }
+  { name:"Sofia", role:"Host da plataforma", shortRole:"Atendimento", genero:"feminino", color:"linear-gradient(135deg,#3b82f6,#06b6d4)", initials:"S", principal:"01-sofia-principal.png", synclip:"01-sofia-synclip.png", saudacao:"Oi! Sou a Sofia, vamos conversar? 😊", perguntas:["O que são humanos digitais?","Como funciona no meu site?","Quais segmentos vocês atendem?","Qual a diferença para um chatbot?","Como solicitar para minha empresa?"] },
+  { name:"Rafael", role:"Especialista em Substituição Tributária", shortRole:"Tributário", genero:"masculino", color:"linear-gradient(135deg,#2563eb,#3b82f6)", initials:"R", principal:"02-rafael-principal.png", synclip:"02-rafael-synclip.png", saudacao:"Oi! Sou o Rafael, especialista tributário. Como posso ajudar? 💼", perguntas:["O que é substituição tributária?","Como funciona o ICMS-ST?","Quais setores são afetados?","Como regularizar pendências fiscais?","Posso parcelar débitos tributários?"] },
+  { name:"Clara", role:"Consultora Hospitalar", shortRole:"Saúde", genero:"feminino", color:"linear-gradient(135deg,#10b981,#34d399)", initials:"C", principal:"03-clara-principal.png", synclip:"03-clara-synclip.png", saudacao:"Olá! Sou a Clara, consultora hospitalar. Em que posso ajudar? 🏥", perguntas:["Quais especialidades o hospital possui?","Como agendar uma consulta?","O hospital atende convênios?","Onde fica a emergência?","Quais horários de atendimento?"] },
+  { name:"Lucas", role:"Consultor Automotivo", shortRole:"Automotivo", genero:"masculino", color:"linear-gradient(135deg,#8b5cf6,#a855f7)", initials:"L", principal:"04-lucas-principal.png", synclip:"04-lucas-synclip.png", saudacao:"E aí! Sou o Lucas, consultor automotivo. Bora conversar? 🚗", perguntas:["Qual a diferença entre os modelos?","Tem financiamento disponível?","Qual o consumo do veículo?","Posso agendar um test drive?","Vocês aceitam carro na troca?"] },
+  { name:"Amanda", role:"Recepcionista de Hotel", shortRole:"Hotelaria", genero:"feminino", color:"linear-gradient(135deg,#f59e0b,#fbbf24)", initials:"A", principal:"05-amanda-principal.png", synclip:"05-amanda-synclip.png", saudacao:"Olá! Sou a Amanda, recepcionista. Bem-vindo, como posso ajudar? 🏨", perguntas:["Quais acomodações estão disponíveis?","Como fazer check-in?","O hotel tem restaurante?","Tem estacionamento?","Qual o horário do café da manhã?"] },
+  { name:"Fernanda", role:"Atendente Municipal", shortRole:"Municipal", genero:"feminino", color:"linear-gradient(135deg,#6366f1,#818cf8)", initials:"F", principal:"06-fernanda-principal.png", synclip:"06-fernanda-synclip.png", saudacao:"Olá! Sou a Fernanda, atendente municipal. O que precisa? 🏛", perguntas:["Como emitir segunda via do IPTU?","Onde fica a secretaria de saúde?","Como abrir um protocolo?","Quais horários de atendimento?","Como solicitar alvará?"] },
+  { name:"Marina", role:"Atendente de Shopping", shortRole:"Varejo", genero:"feminino", color:"linear-gradient(135deg,#f43f5e,#f472b6)", initials:"M", principal:"07-marina-principal.png", synclip:"07-marina-synclip.png", saudacao:"Oi! Sou a Marina, seu guia no shopping. Posso ajudar? 🛍", perguntas:["Onde fica a loja X?","Quais restaurantes têm aqui?","Como chegar ao estacionamento?","Tem alguma promoção hoje?","Onde fica a praça de alimentação?"] },
+  { name:"Roberto", role:"Consultor de Energia Solar", shortRole:"Energia", genero:"masculino", color:"linear-gradient(135deg,#f97316,#fb923c)", initials:"R", principal:"08-roberto-principal.png", synclip:"08-roberto-synclip.png", saudacao:"Oi! Sou o Roberto. Vamos falar sobre energia solar? ☀️", perguntas:["Qual a economia com energia solar?","Quanto tempo leva a instalação?","Posso financiar o sistema?","Qual o retorno do investimento?","Funciona em dias nublados?"] },
+  { name:"Luisa", role:"Mentora Educacional", shortRole:"Educação", genero:"feminino", color:"linear-gradient(135deg,#059669,#10b981)", initials:"L", principal:"09-luisa-principal.png", synclip:"09-luisa-synclip.png", saudacao:"Olá! Sou a Luisa, mentora educacional. Qual sua dúvida? 🎓", perguntas:["Quais cursos estão disponíveis?","Como é o processo de inscrição?","Existem bolsas de estudo?","Como funciona o EAD?","Qual o valor da mensalidade?"] },
+  { name:"Laís", role:"Orientadora Acadêmica — Medicina", shortRole:"Medicina", genero:"feminino", color:"linear-gradient(135deg,#0891b2,#06b6d4)", initials:"L", principal:"10-lais-principal.png", synclip:"10-lais-synclip.png", saudacao:"Oi! Sou a Laís, orientadora de medicina. Vamos conversar? 🩺", perguntas:["Como funciona o internato médico?","Quais especialidades disponíveis?","Como me preparar para a residência?","O que é o CRM médico?","Qual a diferença entre clínica e cirurgia?"] },
+  { name:"Paula", role:"Atendente Odontológica", shortRole:"Odontologia", genero:"feminino", color:"linear-gradient(135deg,#ec4899,#f472b6)", initials:"P", principal:"11-paula-principal.png", synclip:"11-paula-synclip.png", saudacao:"Olá! Sou a Paula, atendente odontológica. Como posso ajudar? 😁", perguntas:["Quais tratamentos estão disponíveis?","Vocês atendem convênios?","Como agendar uma consulta?","Quanto custa um clareamento?","Vocês fazem implantes?"] },
+  { name:"Bruno", role:"Tricolouco — Torcedor Fanático do São Paulo", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#dc2626,#b91c1c)", initials:"B", principal:"12-bruno-principal.png", synclip:"12-bruno-synclip.png", saudacao:"E aí, tricolor! Sou o Bruno, Tricolouco! Bora falar de futebol? ⚽", perguntas:["Como foi o último jogo do SPFC?","Qual o melhor jogador do time?","Quando é o próximo clássico?","Qual a história do São Paulo?","Me conta uma curiosidade do clube?"] },
+  { name:"Giovana", role:"Tricolinda — Torcedora Apaixonada do São Paulo", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#be185d,#ec4899)", initials:"G", principal:"13-giovana-principal.png", synclip:"13-giovana-synclip.png", saudacao:"Oi! Sou a Giovana, Tricolinda e apaixonada pelo São Paulo! 🔴⚪🔵", perguntas:["Qual o título mais importante do SPFC?","Quem é a lenda do clube?","Quando foi fundado o São Paulo?","Como é o Morumbi?","Me fala do Rogério Ceni?"] },
+  { name:"Marcos", role:"Fiel da ZL — Torcedor Corinthiano", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#111827,#374151)", initials:"M", principal:"14-marcos-principal.png", synclip:"14-marcos-synclip.png", saudacao:"Salve Fiel! Sou o Marcos, corinthiano da ZL! Pode falar! 🖤🤍", perguntas:["Como foi o Mundial do Corinthians?","Quem é o maior ídolo da Fiel?","Qual o maior rival do Timão?","Me conta sobre a Neo Química Arena?","Qual o hino do Corinthians?"] },
+  { name:"Carol", role:"Bandona — Torcedora Corinthiana", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#1f2937,#4b5563)", initials:"C", principal:"15-carol-principal.png", synclip:"15-carol-synclip.png", saudacao:"Oi! Sou a Carol, Bandona e Fiel até o fim! Vamos torcer juntos? 🖤🤍", perguntas:["Qual o título mais emocionante do Corinthians?","Como surgiu a Fiel Torcida?","Quem são as lendas femininas do clube?","Me fala da conquista da Libertadores?","O que significa ser corintiano?"] },
+  { name:"Sua Empresa", role:"Comércio · Indústria · Serviços · Turismo · E-commerce", shortRole:"Personalizado", genero:"neutro", color:"linear-gradient(135deg,#1A56DB,#3b82f6)", initials:"★", principal:null, synclip:null, saudacao:"Olá! Posso mostrar como um humano digital pode transformar sua empresa. Vamos conversar? 🚀", perguntas:["Que tipo de empresa pode ter um humano digital?","Como personalizo o avatar para minha marca?","Quanto tempo leva a implementação?","Funciona para e-commerce também?","Como solicitar uma demonstração?"] }
 ];
+
 const solucoesCards = [
   { titulo:"Seu vendedor digital que nunca dorme.", texto:"Atende visitantes em sites de e-commerce e B2B 24 horas por dia. Apresenta produtos, responde objeções, qualifica leads e direciona para o checkout — sem equipe adicional.", tag:"VENDAS DIGITAIS", avatarIndex:7 },
   { titulo:"Recepção inteligente para hospitais e clínicas.", texto:"Orienta pacientes sobre especialidades, convênios aceitos e procedimentos. Agenda consultas, reduz filas e melhora a experiência do paciente desde o primeiro contato.", tag:"SAÚDE", avatarIndex:2 },
@@ -867,12 +901,14 @@ const solucoesCards = [
   { titulo:"Do interesse à proposta em minutos.", texto:"Apresenta soluções, calcula retorno do investimento e agenda visitas técnicas. Qualifica leads e acelera o ciclo de vendas sem depender de equipe comercial presencial.", tag:"ENERGIA", avatarIndex:7 },
   { titulo:"Torcedores digitais que vibram com os fãs.", texto:"Humanos digitais apaixonados pelo time que interagem, comentam jogadas e criam conexão emocional com torcedores. Presença digital que gera engajamento real.", tag:"ENTRETENIMENTO", avatarIndex:11 }
 ];
+
 // ========== ESTADO ==========
 let selectedAvatarIndex = 0;
 let interactionCount = 0;
 let autoReturnTimer = null;
 let ctaModeActive = false;
 let ctaStep = 0;
+
 // ========== ELEMENTOS ==========
 const thumbnailGrid = document.getElementById('thumbnailGrid');
 const avatarLarge = document.getElementById('avatarLarge');
@@ -890,7 +926,9 @@ const saudacaoMsg = document.getElementById('saudacaoMsg');
 const quickRepliesArea = document.getElementById('quickRepliesArea');
 const perguntasBox = document.getElementById('perguntasBox');
 const perguntasLista = document.getElementById('perguntasLista');
+
 function limparQuickReplies() { quickRepliesArea.innerHTML = ''; }
+
 function mostrarPerguntasMainArea(avatar) {
   if (!perguntasBox || !perguntasLista) return;
   if (avatar.perguntas && avatar.perguntas.length > 0 && avatar.name !== 'Sofia') {
@@ -913,6 +951,7 @@ function mostrarPerguntasMainArea(avatar) {
     perguntasLista.innerHTML = '';
   }
 }
+
 function abrirSofiaComCTA() {
   const fl = document.getElementById('avatarFlutuante');
   if (fl.classList.contains('minimized')) { fl.classList.remove('minimized'); document.getElementById('minimizeBtn').textContent = '−'; }
@@ -929,75 +968,88 @@ function abrirSofiaComCTA() {
     quickRepliesArea.appendChild(btn);
   });
 }
+
 function resetAutoReturnTimer() {
   if (autoReturnTimer) clearTimeout(autoReturnTimer);
   if (selectedAvatarIndex !== 0) {
     autoReturnTimer = setTimeout(() => { if (selectedAvatarIndex !== 0) { updateSelectedAvatar(0); interactionCount = 0; } }, 45000);
   }
 }
+
 function updateSelectedAvatar(index) {
   selectedAvatarIndex = index;
   const avatar = avatars[index];
-  
-  // Avatar grande central - usar imagem principal
-  const imgEl = document.getElementById('avatarLarge');
-  imgEl.innerHTML = '';
-  const img = document.createElement('img');
-  img.src = avatar.principal;
-  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;';
-  img.onerror = () => {
-    imgEl.textContent = avatar.initials;
-    imgEl.style.background = avatar.color;
-  };
-  imgEl.appendChild(img);
-  
+  // using global GH_BASE
+
+  // ── AVATAR GRANDE CENTRAL (usa img_principal) ──
+  avatarLarge.innerHTML = '';
+  if (avatar.principal) {
+    const img = document.createElement('img');
+    img.src = GH_BASE + 'estaticas/' + avatar.principal;
+    img.alt = avatar.name;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;display:block;';
+    img.onerror = () => {
+      avatarLarge.innerHTML = '';
+      avatarLarge.textContent = avatar.initials;
+      avatarLarge.style.background = avatar.color;
+    };
+    avatarLarge.appendChild(img);
+    avatarLarge.style.background = 'none';
+  } else {
+    avatarLarge.textContent = avatar.initials;
+    avatarLarge.style.background = avatar.color;
+  }
+
   avatarName.textContent = avatar.name;
   avatarRole.textContent = avatar.role;
   floatAvatarIcon.textContent = avatar.initials;
   floatAvatarName.textContent = avatar.name;
   floatAvatarRole.textContent = avatar.shortRole;
-  
-  // Widget canto inferior direito - usar imagem synclip
-  const floatImg = document.getElementById('floatAvatarPlaceholder');
-  floatImg.innerHTML = '';
-  const fImg = document.createElement('img');
-  fImg.src = avatar.synclip;
-  fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-  fImg.onerror = () => {
-    floatImg.textContent = avatar.initials;
-    floatImg.style.background = avatar.color;
-  };
-  floatImg.appendChild(fImg);
-  // Saudação no widget — sem quick replies no widget
+
+  // ── WIDGET CANTO INFERIOR DIREITO (usa img_synclip) ──
+  floatAvatarPlaceholder.innerHTML = '';
+  if (avatar.synclip) {
+    const fImg = document.createElement('img');
+    fImg.src = GH_BASE + 'synclip/' + avatar.synclip;
+    fImg.alt = avatar.name;
+    fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    fImg.onerror = () => {
+      floatAvatarPlaceholder.innerHTML = '';
+      const sp = document.createElement('span');
+      sp.id = 'floatPlaceholderLetter';
+      sp.textContent = avatar.initials;
+      floatAvatarPlaceholder.appendChild(sp);
+      floatAvatarPlaceholder.style.background = avatar.color;
+    };
+    floatAvatarPlaceholder.appendChild(fImg);
+    floatAvatarPlaceholder.style.background = 'none';
+  } else {
+    const sp = document.createElement('span');
+    sp.textContent = avatar.initials;
+    floatAvatarPlaceholder.appendChild(sp);
+    floatAvatarPlaceholder.style.background = avatar.color;
+  }
+
+  // Saudação no widget
   if (!ctaModeActive) {
     saudacaoMsg.textContent = avatar.saudacao;
     limparQuickReplies();
   }
+
   // Perguntas no painel principal abaixo do avatar grande
   mostrarPerguntasMainArea(avatar);
+
   if (index !== 0) demoBadge.classList.add('active');
   else { demoBadge.classList.remove('active'); if (!ctaModeActive) limparQuickReplies(); }
-  // Thumbnails do grid - usar imagens principais
+
   document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
-    const av = avatars[i];
-    const thumbContainer = btn.querySelector('.thumbnail-avatar');
-    if (thumbContainer) {
-      thumbContainer.innerHTML = '';
-      const t = document.createElement('img');
-      t.src = av.principal;
-      t.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;';
-      t.onerror = () => {
-        thumbContainer.textContent = av.initials;
-        thumbContainer.style.background = av.color;
-      };
-      thumbContainer.appendChild(t);
-    }
     if (i === index) { btn.classList.add('selected'); btn.querySelector('.thumbnail-name').style.color = '#1a1a1a'; }
     else { btn.classList.remove('selected'); btn.querySelector('.thumbnail-name').style.color = '#6b7280'; }
   });
   interactionCount = 0;
   resetAutoReturnTimer();
 }
+
 function handleInteraction() {
   if (ctaModeActive && ctaStep === 1) {
     const val = chatInput.value.trim();
@@ -1028,15 +1080,35 @@ function handleInteraction() {
     } else resetAutoReturnTimer();
   }
 }
+
 // RENDERIZAR THUMBNAILS
 avatars.forEach((avatar, index) => {
   const btn = document.createElement('button');
   btn.className = `thumbnail-btn ${index === 0 ? 'selected' : ''}`;
   btn.onclick = () => { ctaModeActive = false; updateSelectedAvatar(index); };
+
   const thumbDiv = document.createElement('div');
   thumbDiv.className = 'thumbnail-avatar';
-  thumbDiv.style.background = avatar.color;
-  thumbDiv.textContent = avatar.initials;
+
+  if (avatar.principal) {
+    // Tenta imagem real primeiro
+    const tImg = document.createElement('img');
+    tImg.src = GH_BASE + 'estaticas/' + avatar.principal;
+    tImg.alt = avatar.name;
+    tImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;';
+    tImg.onerror = () => {
+      // Fallback: cor + inicial
+      thumbDiv.innerHTML = '';
+      thumbDiv.textContent = avatar.initials;
+      thumbDiv.style.background = avatar.color;
+    };
+    thumbDiv.appendChild(tImg);
+    thumbDiv.style.background = 'none';
+  } else {
+    thumbDiv.textContent = avatar.initials;
+    thumbDiv.style.background = avatar.color;
+  }
+
   const nameSpan = document.createElement('span');
   nameSpan.className = 'thumbnail-name';
   nameSpan.style.color = index === 0 ? '#1a1a1a' : '#6b7280';
@@ -1045,17 +1117,33 @@ avatars.forEach((avatar, index) => {
   btn.appendChild(nameSpan);
   thumbnailGrid.appendChild(btn);
 });
+
 // RENDERIZAR SOLUÇÕES
 const solucoesGrid = document.getElementById('solucoesGrid');
 solucoesCards.forEach(card => {
   const av = avatars[card.avatarIndex];
   const cardDiv = document.createElement('div');
   cardDiv.className = 'solucao-card';
+
+  // Círculo com foto real
   const circle = document.createElement('div');
   circle.className = 'avatar-circle';
-  circle.style.background = av.color;
-  circle.textContent = av.initials;
   circle.title = `Clique para conversar com ${av.name}`;
+  circle.style.background = av.color; // fallback bg
+
+  if (av.principal) {
+    const cImg = document.createElement('img');
+    cImg.src = GH_BASE + 'estaticas/' + av.principal;
+    cImg.alt = av.name;
+    cImg.onerror = () => {
+      circle.removeChild(cImg);
+      circle.textContent = av.initials;
+    };
+    circle.appendChild(cImg);
+  } else {
+    circle.textContent = av.initials;
+  }
+
   circle.onclick = (e) => {
     e.stopPropagation();
     ctaModeActive = false;
@@ -1063,12 +1151,14 @@ solucoesCards.forEach(card => {
     const fl = document.getElementById('avatarFlutuante');
     if (fl.classList.contains('minimized')) { fl.classList.remove('minimized'); document.getElementById('minimizeBtn').textContent = '−'; }
   };
+
   const tag = document.createElement('span'); tag.className = 'solucao-tag'; tag.textContent = card.tag;
   const h3 = document.createElement('h3'); h3.textContent = card.titulo;
   const p = document.createElement('p'); p.textContent = card.texto;
   cardDiv.appendChild(circle); cardDiv.appendChild(tag); cardDiv.appendChild(h3); cardDiv.appendChild(p);
   solucoesGrid.appendChild(cardDiv);
 });
+
 // WIDGET CONTROLS
 const avatarFlutuante = document.getElementById('avatarFlutuante');
 const minimizeBtn = document.getElementById('minimizeBtn');
@@ -1078,6 +1168,7 @@ avatarHeaderEl.addEventListener('click', (e) => { if (e.target === minimizeBtn |
 sendBtn.addEventListener('click', () => { if (chatInput.value.trim()) { handleInteraction(); } });
 chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (chatInput.value.trim()) handleInteraction(); } });
 document.getElementById('openSofiaWidget')?.addEventListener('click', (e) => { e.preventDefault(); if (avatarFlutuante.classList.contains('minimized')) { avatarFlutuante.classList.remove('minimized'); minimizeBtn.textContent = '−'; } });
+
 // MICROFONE
 document.getElementById('micBtn')?.addEventListener('click', function() {
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -1089,6 +1180,7 @@ document.getElementById('micBtn')?.addEventListener('click', function() {
     rec.onend = () => { this.style.background = '#4f46e5'; this.textContent = '🎤'; };
   }
 });
+
 // PALAVRAS DINÂMICAS
 const words = document.querySelectorAll('.dynamic-word');
 let wordIndex = 0;
@@ -1097,6 +1189,7 @@ setInterval(() => {
   wordIndex = (wordIndex + 1) % words.length;
   words[wordIndex].classList.add('active');
 }, 7000);
+
 // COUNTER ANIMATION
 const counters = [
   {id:'counter1',target:3,suffix:'x'},{id:'counter2',target:24,suffix:'h'},{id:'counter3',target:70,suffix:'%'},
@@ -1111,10 +1204,12 @@ const counterObserver = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{ if(entry.isIntersecting){ const idx=parseInt(entry.target.getAttribute('data-index')); const c=counters[idx]; const el=document.getElementById(c.id); if(activeTimers[c.id])clearInterval(activeTimers[c.id]); el.textContent='0'+c.suffix; activeTimers[c.id]=animateCounter(el,c.target,c.suffix); } });
 },{threshold:0.3});
 document.querySelectorAll('.counter-card').forEach((card,idx)=>{ card.setAttribute('data-index',idx); counterObserver.observe(card); });
+
 // FAQ
 document.querySelectorAll('.faq-question-full').forEach(q=>{
   q.addEventListener('click',()=>{ q.classList.toggle('active'); q.nextElementSibling.classList.toggle('open'); });
 });
+
 // WhatsApp onboarding link builder
 function montarLinkWhatsApp(e) {
   e.preventDefault();
@@ -1133,6 +1228,7 @@ function montarLinkWhatsApp(e) {
   const url = 'https://wa.me/5511XXXXXXXXX?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
 }
+
 updateSelectedAvatar(0);
 </script>
 </body>
