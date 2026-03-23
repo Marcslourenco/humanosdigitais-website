@@ -868,6 +868,10 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 </section>
 
 <script>
+// ========== BACKEND TTS ==========
+window.HD_BACKEND_URL = window.HD_BACKEND_URL ||
+  'https://humanos-digitais-tts.onrender.com';
+
 // ========== DADOS DOS AVATARES ==========
 const GH_BASE = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
 const avatars = [
@@ -979,13 +983,13 @@ function resetAutoReturnTimer() {
 function updateSelectedAvatar(index) {
   selectedAvatarIndex = index;
   const avatar = avatars[index];
-  // using global GH_BASE
+  const GH = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
 
   // ── AVATAR GRANDE CENTRAL (usa img_principal) ──
   avatarLarge.innerHTML = '';
   if (avatar.principal) {
     const img = document.createElement('img');
-    img.src = GH_BASE + 'estaticas/' + avatar.principal;
+    img.src = GH + 'estaticas/' + avatar.principal;
     img.alt = avatar.name;
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;display:block;';
     img.onerror = () => {
@@ -1010,7 +1014,7 @@ function updateSelectedAvatar(index) {
   floatAvatarPlaceholder.innerHTML = '';
   if (avatar.synclip) {
     const fImg = document.createElement('img');
-    fImg.src = GH_BASE + 'synclip/' + avatar.synclip;
+    fImg.src = GH + 'synclip/' + avatar.synclip;
     fImg.alt = avatar.name;
     fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
     fImg.onerror = () => {
@@ -1048,6 +1052,30 @@ function updateSelectedAvatar(index) {
   });
   interactionCount = 0;
   resetAutoReturnTimer();
+
+  // ── TOCAR SAUDAÇÃO COM VOZ ──
+  const avatarIdTTS = avatar.name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  setTimeout(() => {
+    if (typeof window.saudarAvatar === 'function') {
+      window.saudarAvatar(avatarIdTTS);
+    } else if (window.HD_BACKEND_URL) {
+      fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          avatar_id: avatarIdTTS,
+          text: avatar.saudacao.replace(/[😊🏥🚗🏨🏛🛍☀️🎓🩺😁⚽🔴⚪🔵🖤🤍🚀💼]/g,''),
+          emotion: 'friendly'
+        })
+      }).then(r=>r.json()).then(d=>{
+        if (d.audio_base64) {
+          const a = new Audio('data:audio/mp3;base64,'+d.audio_base64);
+          a.play().catch(()=>{});
+        }
+      }).catch(()=>{});
+    }
+  }, 300);
 }
 
 function handleInteraction() {
@@ -1061,13 +1089,45 @@ function handleInteraction() {
     }
     return;
   }
+
+  const userMsg = chatInput.value.trim();
+  if (userMsg) {
+    // Mostrar mensagem do usuário no bubble
+    saudacaoMsg.textContent = avatars[selectedAvatarIndex].saudacao;
+    chatInput.value = '';
+
+    // Chamar TTS se disponível
+    const avatarId = avatars[selectedAvatarIndex].name.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const respostaAvatar = `Recebi sua mensagem: "${userMsg}". Estou aqui para ajudar!`;
+
+    if (typeof window.falarAvatar === 'function') {
+      window.falarAvatar(avatarId, respostaAvatar);
+    } else if (window.HD_BACKEND_URL) {
+      // Fallback direto se index_patch.js não carregou
+      fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          avatar_id: avatarId,
+          text: respostaAvatar,
+          emotion: 'friendly'
+        })
+      }).then(r => r.json()).then(d => {
+        if (d.audio_base64) {
+          const audio = new Audio('data:audio/mp3;base64,' + d.audio_base64);
+          audio.play().catch(()=>{});
+        }
+      }).catch(()=>{});
+    }
+  }
+
   if (selectedAvatarIndex !== 0) {
     interactionCount++;
     if (interactionCount >= 5) {
       saudacaoMsg.textContent = "Esta foi uma breve demonstração. A Sofia pode explicar como esta tecnologia funcionaria no seu site! 😊";
       limparQuickReplies();
       perguntasBox.classList.remove('visivel');
-      // Mostrar botão voltar na caixa de perguntas
       perguntasLista.innerHTML = '';
       const btnVoltar = document.createElement('div');
       btnVoltar.className = 'pergunta-item';
