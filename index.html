@@ -1322,5 +1322,19 @@ function montarLinkWhatsApp(e) {
 
 updateSelectedAvatar(0);
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const sendBtn = document.getElementById("sendMessageBtn");
+  if (sendBtn) {
+    sendBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (typeof handleInteraction === "function") {
+        handleInteraction();
+      }
+    });
+  }
+});
+</script>
 </body>
 </html>
