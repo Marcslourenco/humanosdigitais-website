@@ -1322,22 +1322,5 @@ function montarLinkWhatsApp(e) {
 
 updateSelectedAvatar(0);
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const sendBtn = document.getElementById("sendMessageBtn");
-  if (!sendBtn) {
-    console.error("sendMessageBtn não encontrado no DOM");
-    return;
-  }
-
-  sendBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    handleInteraction();
-  });
-
-  console.log("sendMessageBtn conectado ao handleInteraction()");
-});
-</script>
 </body>
 </html>
