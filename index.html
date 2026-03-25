@@ -870,8 +870,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 <!-- VERCEL FORCE REBUILD: 2026-03-24T18:05:00Z -->
 <script>
 // ========== BACKEND TTS ==========
-// Usar proxy CORS para contornar Mixed Content
-window.HD_BACKEND_URL = window.HD_BACKEND_URL || 'https://cors-anywhere.herokuapp.com/http://atti-media-server.fly.dev';
+window.HD_BACKEND_URL = window.HD_BACKEND_URL || 'https://atti-media-server.fly.dev';
 // Vercel Force Rebuild: 2026-03-24 18:00
 
 // ========== DADOS DOS AVATARES ==========
@@ -975,12 +974,7 @@ async function falarAvatar(avatarId, texto, emotion = 'friendly') {
   if (!cleanAvatarId) throw new Error('avatarId inválido');
   if (!cleanText) throw new Error('Texto vazio para TTS');
 
-  // Usar HTTP direto para o Fly.io (sem CORS proxy)
-  const backendUrl = window.HD_BACKEND_URL.includes('cors-anywhere') 
-    ? window.HD_BACKEND_URL 
-    : 'http://atti-media-server.fly.dev';
-  
-  const response = await fetch(backendUrl + '/api/avatar/speak', {
+  const response = await fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
