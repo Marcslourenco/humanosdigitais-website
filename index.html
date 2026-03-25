@@ -870,8 +870,8 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 <!-- VERCEL FORCE REBUILD: 2026-03-24T18:05:00Z -->
 <script>
 // ========== BACKEND TTS ==========
-// Usar AllOrigins CORS proxy (mais confiável)
-window.HD_BACKEND_URL = window.HD_BACKEND_URL || 'https://api.allorigins.win/raw?url=http://atti-media-server.fly.dev';
+// Usar AllOrigins CORS proxy com /get endpoint
+window.HD_BACKEND_URL = window.HD_BACKEND_URL || 'https://api.allorigins.win/get?url=http://atti-media-server.fly.dev';
 // Vercel Force Rebuild: 2026-03-24 18:00
 
 // ========== DADOS DOS AVATARES ==========
@@ -975,7 +975,13 @@ async function falarAvatar(avatarId, texto, emotion = 'friendly') {
   if (!cleanAvatarId) throw new Error('avatarId inválido');
   if (!cleanText) throw new Error('Texto vazio para TTS');
 
-  const response = await fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
+  // AllOrigins /get endpoint requer query param
+  const isAllOrigins = window.HD_BACKEND_URL.includes('allorigins');
+  const targetUrl = isAllOrigins 
+    ? window.HD_BACKEND_URL.replace('?url=', '?url=') + '/api/avatar/speak'
+    : window.HD_BACKEND_URL + '/api/avatar/speak';
+  
+  const response = await fetch(targetUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
