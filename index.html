@@ -987,7 +987,13 @@ async function falarAvatar(avatarId, texto, emotion = 'friendly') {
 
   let data = null;
   try {
-    data = await response.json();
+    const json = await response.json();
+    // Se for resposta do AllOrigins, extrair do .contents
+    if (json.contents) {
+      data = typeof json.contents === 'string' ? JSON.parse(json.contents) : json.contents;
+    } else {
+      data = json;
+    }
   } catch (error) {
     throw new Error('Resposta inválida do backend TTS');
   }
