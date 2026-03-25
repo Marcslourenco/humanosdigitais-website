@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humanos Digitais - Plataforma de Trabalhadores Digitais</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0A2A44; color: #1a1a1a; line-height: 1.5; overflow-x: hidden; }
+
+/* HEADER */
+.header { position: fixed; top: 0; left: 0; right: 0; background: black; color: white; padding: 0 5%; height: 80px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
+.logo-container { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.logo-text { display: flex; flex-direction: column; }
+.logo-text span { font-size: 1.1rem; font-weight: 700; color: white; line-height: 1.1; }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a { color: white; text-decoration: none; font-size: 0.9rem; transition: opacity 0.2s; }
+.nav-links a:hover { opacity: 0.7; }
+.cta-button { background: white; color: black !important; padding: 10px 20px; border-radius: 999px; font-weight: 700 !important; transition: background 0.3s, color 0.3s !important; }
+.cta-button:hover { background: #22c55e !important; color: white !important; opacity: 1 !important; }
+
+/* ============================================
+   AVATAR FLUTUANTE — tamanho original 200px
+   ============================================ */
+.avatar-flutuante {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  width: 240px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+.avatar-flutuante.minimized {
+  transform: translateY(calc(100% - 42px));
+}
+.avatar-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
+.demo-badge {
+  display: none;
+  background: #f59e0b;
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.demo-badge.active { display: block; }
+.avatar-icon-small { width: 28px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0; }
+.avatar-info-small { flex: 1; }
+.avatar-info-small h4 { font-size: 0.8rem; font-weight: 700; margin: 0; }
+.avatar-info-small p { font-size: 0.65rem; opacity: 0.85; margin: 0; }
+.minimize-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1rem; cursor: pointer; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; line-height: 1; flex-shrink: 0; }
+.minimize-btn:hover { background: rgba(255,255,255,0.35); }
+.avatar-body { background: white; }
+.avatar-video-area {
+  width: 100%;
+  height: 195px;
+  background: linear-gradient(135deg, #3a2a6a 0%, #5a3a8a 100%);
+  position: relative;
+  overflow: hidden;
+}
+.avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: bold; background: radial-gradient(circle at 30% 30%, #6a4a9a, #2a1a4a); }
+.chat-bubble-small {
+  background: #f4f4f8;
+  padding: 9px 12px;
+  font-size: 0.76rem;
+  color: #333;
+  line-height: 1.45;
+  border-top: 1px solid #ebebeb;
+}
+.quick-replies-small { display: flex; flex-wrap: wrap; gap: 4px; padding: 5px 10px; background: white; border-top: 1px solid #f0f0f0; }
+.quick-reply-btn { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 3px 8px; font-size: 0.65rem; cursor: pointer; color: #1d4ed8; transition: background 0.2s; }
+.quick-reply-btn:hover { background: #dbeafe; }
+.avatar-input-overlay {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 7px 8px;
+  border-top: 1px solid #f0f0f0;
+  gap: 5px;
+}
+.avatar-input-overlay input { flex: 1; border: 1px solid #e5e7eb; border-radius: 999px; padding: 6px 10px; font-size: 0.75rem; outline: none; background: #fafafa; color: #333; min-width: 0; }
+.avatar-input-overlay input:focus { border-color: #6d28d9; }
+.input-actions-small { display: flex; gap: 3px; flex-shrink: 0; }
+.input-actions-small button { width: 28px; height: 28px; border-radius: 50%; border: none; background: #4f46e5; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: background 0.2s; }
+.input-actions-small button:hover { background: #6366f1; }
+
+/* ============================================
+   SEÇÃO 1 — STICKY para efeito de sobreposição
+   ============================================ */
+.section-1 {
+  height: 100vh;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at center, #0A2A44 0%, #1A3A5A 50%, #2A4A6A 100%);
+  color: white;
+}
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 5%;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding-top: 80px;
+}
+/* Hero h1 — 2 linhas: "Humanos Digitais [PALAVRA]" / "Trabalham 24 Horas" */
+.hero h1 {
+  font-size: clamp(2.2rem, 6.5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: white;
+}
+.hero-line1 {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.hero-line2 {
+  display: block;
+  margin-top: 0;
+}
+.static-text { display: inline; }
+.dynamic-container {
+  display: inline-block;
+  position: relative;
+  height: 1.2em;
+  min-width: 380px;
+  width: auto;
+  overflow: visible;
+  vertical-align: bottom;
+  margin-left: 16px;
+}
+.dynamic-word {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  font-weight: 700;
+  font-style: italic;
+  color: #90caf9;
+  white-space: nowrap;
+  line-height: 1.2;
+  transition: none;
+}
+.dynamic-word.active { animation: slideSuperSlow 7s infinite; }
+@keyframes slideSuperSlow {
+  0%   { opacity: 0; transform: translateY(60px); }
+  8%   { opacity: 1; transform: translateY(0); }
+  45%  { opacity: 1; transform: translateY(0); }
+  53%  { opacity: 0; transform: translateY(-60px); }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+.hero-text { margin-top: 28px; max-width: 700px; }
+.hero-text .linha { font-size: 1.1rem; color: rgba(255,255,255,0.9); margin-bottom: 4px; line-height: 1.4; }
+.hero-text .linha strong { color: #90caf9; font-weight: 700; }
+.frases-lista { list-style: none; margin-top: 12px; }
+.frases-lista li { font-size: 1.05rem; color: rgba(255,255,255,0.9); margin-bottom: 6px; line-height: 1.4; padding-left: 22px; position: relative; }
+.frases-lista li::before { content: "✦"; color: #90caf9; position: absolute; left: 0; font-size: 0.9rem; }
+.cta-button-hero { display: inline-block; margin-top: 28px; padding: 10px 28px; background: white; color: #0A2A44; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 0.95rem; transition: background 0.3s; border: none; cursor: pointer; width: fit-content; max-width: fit-content; align-self: flex-start; }
+.cta-button-hero:hover { background: #e0e0e0; }
+
+/* ============================================
+   PAINÉIS QUE SOBEM — z-index > section-1
+   ============================================ */
+.content-panel {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 6%;
+}
+.floating-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #f8fafc;
+  border-radius: 0;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+  min-height: 100vh;
+}
+.panel-inner { padding: 100px 40px 60px 40px; }
+.panel-header { text-align: left; margin-bottom: 40px; max-width: 800px; }
+.panel-header h2 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: #1a1a1a; letter-spacing: -0.02em; margin-bottom: 8px; }
+.panel-header .subtitulo { font-size: 1.3rem; color: #333; font-weight: 700; margin-bottom: 4px; }
+.panel-header .descricao { font-size: 1.1rem; color: #111; font-weight: 400; }
+
+/* GRID AVATARES */
+.two-columns { display: flex; flex-direction: row; gap: 2rem; align-items: start; }
+.thumbnails-grid { width: 50%; flex-shrink: 0; }
+.grid-3-cols {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+  justify-items: stretch;
+}
+.thumbnail-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+.thumbnail-avatar {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: clamp(1rem, 2.2vw, 1.6rem);
+  font-weight: bold;
+  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  min-width: 0;
+  min-height: 0;
+}
+.thumbnail-btn:hover .thumbnail-avatar {
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+}
+.thumbnail-btn.selected .thumbnail-avatar {
+  box-shadow: 0 0 0 3px white, 0 0 0 5px #3b82f6, 0 6px 20px rgba(59,130,246,0.3);
+  transform: scale(1.04);
+}
+.thumbnail-name {
+  font-size: 0.58rem;
+  font-weight: 600;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #374151;
+  text-align: center;
+  height: 14px;
+  line-height: 14px;
+  display: block;
+}
+.main-avatar { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.avatar-large { width: 100%; border-radius: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 6rem; font-weight: bold; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3); aspect-ratio: 1/1; }
+.avatar-info { margin-top: 0.75rem; padding: 0 0.25rem; }
+.avatar-info h3 { font-size: 1.4rem; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+.avatar-info .role { color: #1A56DB; font-weight: 700; font-size: 0.95rem; margin-top: 0; }
+/* Caixa de perguntas abaixo do avatar grande */
+.perguntas-box {
+  margin-top: 16px;
+  background: #f0f4ff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: none;
+}
+.perguntas-box.visivel { display: block; }
+.perguntas-box-titulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1A56DB;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.pergunta-item {
+  background: white;
+  border: 1px solid #e0eaff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: #334155;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pergunta-item::before { content: "💬"; font-size: 0.75rem; flex-shrink: 0; }
+.pergunta-item:hover { background: #eff6ff; border-color: #93c5fd; }
+.pergunta-item:last-child { margin-bottom: 0; }
+
+.counter-bottom-dark {
+  background: #0A0F1C;
+  border-radius: 0 0 0 0;
+  margin: 0 -40px -60px;
+  padding: 40px 40px 60px;
+}
+.cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.feature-card { background: #1a2235; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); }
+.card-tag { display: inline-block; background: rgba(26,86,219,0.25); color: #93c5fd; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.05em; }
+.feature-card h3 { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 10px; }
+.feature-card p { font-size: 0.9rem; color: #94a3b8; line-height: 1.6; }
+.counter-title { text-align: center; font-size: 2rem; font-weight: 700; color: #0A2A44; margin-bottom: 32px; padding-top: 0; }
+.counter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 48px; }
+.counter-card { background: white; border-radius: 16px; padding: 28px 24px; text-align: center; box-shadow: 0 2px 12px rgba(26,86,219,0.08); transition: transform 0.2s; cursor: default; }
+.counter-card:hover { transform: translateY(-4px); }
+.counter-number { font-size: 3rem; font-weight: 900; color: #1A56DB; line-height: 1; margin-bottom: 8px; }
+.counter-label { font-size: 0.9rem; color: #475569; font-weight: 500; }
+.cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.feature-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.card-tag { display: inline-block; background: #eff6ff; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.05em; }
+.feature-card h3 { font-size: 1.1rem; font-weight: 700; color: #0A2A44; margin-bottom: 10px; }
+.feature-card p { font-size: 0.9rem; color: #475569; line-height: 1.6; }
+
+/* SOLUÇÕES */
+.solucoes-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
+.solucoes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
+.solucao-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(26,86,219,0.08); }
+.avatar-circle { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 1.3rem; margin-bottom: 14px; border: 3px solid white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.avatar-circle:hover { transform: scale(1.12); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
+.avatar-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.solucao-tag { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.05em; }
+.solucao-card h3 { font-size: 1.05rem; font-weight: 700; color: #0A2A44; margin-bottom: 8px; }
+.solucao-card p { font-size: 0.88rem; color: #475569; line-height: 1.6; }
+.solucoes-cta { text-align: center; margin-top: 8px; }
+.btn-solucoes { display: inline-block; background: #1A56DB; color: white; padding: 14px 32px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: background 0.2s; }
+.btn-solucoes:hover { background: #1341a8; }
+
+/* RECURSOS */
+.recursos-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
+.recursos-header { text-align: center; margin-bottom: 40px; }
+.recursos-header h2 { font-size: 2rem; font-weight: 800; color: #0A2A44; margin-bottom: 12px; }
+.recursos-header .subtitulo { color: #475569; font-size: 1.05rem; }
+.recursos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+.recurso-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(26,86,219,0.08); }
+.recurso-icon { margin-bottom: 14px; display: flex; align-items: center; gap: 0; }
+.recurso-icon img { height: 72px; width: auto; object-fit: contain; opacity: 0.92; }
+.recurso-icon .recurso-emoji { display: none; }
+.recurso-tag { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.05em; }
+.recurso-card h3 { font-size: 1rem; font-weight: 700; color: #0A2A44; margin-bottom: 8px; }
+.recurso-card p { font-size: 0.88rem; color: #475569; line-height: 1.6; }
+.recursos-cta { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.btn-primary { display: inline-block; background: #1A56DB; color: white; padding: 14px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; transition: background 0.2s; }
+.btn-primary:hover { background: #1341a8; }
+.btn-outline-light { display: inline-block; border: 2px solid #1A56DB; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; transition: all 0.2s; }
+.btn-outline-light:hover { background: #1A56DB; color: white; }
+
+/* PREÇOS */
+.precos-section .floating-panel { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); }
+.precos-header { text-align: center; margin-bottom: 40px; }
+.precos-header h2 { font-size: 2rem; font-weight: 800; color: #0A2A44; margin-bottom: 8px; }
+.precos-header .subtitulo { color: #0A2A44; font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+.precos-nota { color: #64748b; font-size: 0.9rem; }
+.precos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
+.preco-card { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; }
+.enterprise-card-white { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: relative; border: 2px solid #1A56DB; }
+.popular-badge { background: #1A56DB; color: white; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; font-weight: 700; padding: 4px 16px; border-radius: 999px; white-space: nowrap; }
+.plan-name { font-size: 1.4rem; font-weight: 800; color: #0A2A44; margin-bottom: 6px; }
+.plan-desc { font-size: 0.88rem; color: #64748b; margin-bottom: 16px; }
+.plan-price { font-size: 2.5rem; font-weight: 900; color: #1A56DB; line-height: 1; }
+.plan-price small { font-size: 1rem; font-weight: 400; color: #6b7280; }
+.price-note { font-size: 0.8rem; color: #6b7280; margin-top: 4px; margin-bottom: 20px; }
+.btn-plan { display: block; text-align: center; background: #1A56DB; color: white; padding: 12px; border-radius: 999px; text-decoration: none; font-weight: 700; margin-bottom: 20px; transition: background 0.2s; }
+.btn-plan:hover { background: #1341a8; }
+.features-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.features-list li { font-size: 0.85rem; color: #374151; padding-left: 20px; position: relative; }
+.features-list li::before { content: "✓"; position: absolute; left: 0; color: #22c55e; font-weight: 700; }
+.features-list li.not-included { color: #9ca3af; }
+.features-list li.not-included::before { content: "✕"; color: #d1d5db; }
+.whatsapp-highlight { display: block; color: #1A56DB; font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
+.cta-banner { background: #1A56DB; border-radius: 16px; padding: 32px; text-align: center; color: white; margin-top: 8px; }
+.cta-banner h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; }
+.cta-banner .btn-white { display: inline-block; background: white; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; margin-bottom: 12px; }
+.cta-banner p { font-size: 0.9rem; opacity: 0.8; }
+
+/* FAQ */
+.faq-section-full { width: 100%; }
+.faq-two-columns { display: grid; grid-template-columns: 40% 60%; gap: 48px; margin-bottom: 48px; }
+.faq-left h2 { font-size: 1.75rem; font-weight: 800; color: #0A2A44; margin-bottom: 12px; line-height: 1.15; }
+.faq-left p { color: #64748b; margin-bottom: 24px; font-size: 1rem; }
+.sofia-image { width: 100%; min-height: 300px; border-radius: 20px; background: linear-gradient(135deg, #3b82f6, #6d28d9); display: flex; align-items: center; justify-content: center; font-size: 6rem; font-weight: 700; color: white; box-shadow: 0 8px 32px rgba(26,86,219,0.15); margin-bottom: 16px; }
+.faq-left .note { font-size: 0.85rem; color: #6b7280; }
+.faq-item-full { border-bottom: 1px solid #e5e7eb; }
+.faq-question-full {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #0A2A44;
+  font-size: 0.92rem;
+  background: #f1f5fb;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+.faq-question-full:hover { background: #e0eaff; color: #1A56DB; }
+.faq-question-full .icon { font-size: 0.9rem; transition: transform 0.2s; flex-shrink: 0; margin-left: 12px; color: #1A56DB; }
+.faq-question-full.active { background: #dbeafe; color: #1A56DB; }
+.faq-question-full.active .icon { transform: rotate(90deg); }
+.faq-answer-full {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.2s;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  background: #f8faff;
+  border-radius: 0 0 10px 10px;
+  padding: 0 16px;
+  margin-bottom: 6px;
+}
+.faq-answer-full.open { max-height: 300px; padding: 14px 16px 16px; }
+.faq-cta { background: #1A56DB; border-radius: 20px; padding: 40px; text-align: center; color: white; }
+.faq-cta h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; }
+.faq-cta .btn-white { display: inline-block; background: white; color: #1A56DB; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; margin-bottom: 12px; }
+.faq-cta .small-text { font-size: 0.85rem; opacity: 0.8; }
+.faq-cta .small-text a { color: white; }
+
+/* DEMONSTRAÇÃO — Onboarding e Pagamentos */
+.onboarding-box {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0 16px;
+}
+.onboarding-titulo { color: #93c5fd; font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.onboarding-input {
+  width: 100%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: white;
+  margin-bottom: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.onboarding-input::placeholder { color: rgba(255,255,255,0.5); }
+.onboarding-input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.15); }
+.onboarding-upload-hint { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.pagamentos-box { margin-top: 12px; }
+.pagamentos-titulo { color: rgba(255,255,255,0.6); font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.pagamentos-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.pay-tag { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 4px 12px; font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 600; }
+.pagamentos-nota { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+
+/* DEMONSTRAÇÃO */
+.demo-section { background: linear-gradient(135deg, #0A0F1C, #1e3a5f); padding: 80px 8%; position: relative; z-index: 10; }
+.demo-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.demo-text h2 { font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 12px; line-height: 1.2; }
+.demo-text .subtitle { color: #93c5fd; font-size: 1.05rem; margin-bottom: 32px; }
+.steps-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+.step-item { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; color: white; font-size: 0.95rem; }
+.step-num { width: 28px; height: 28px; background: #1A56DB; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; color: white; }
+.botoes-cta { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.btn-whatsapp { display: block; width: 100%; max-width: 360px; text-align: center; padding: 16px 32px; background: #25D366; color: white; border-radius: 999px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: background 0.2s; }
+.btn-whatsapp:hover { background: #1da851; }
+.btn-ligacao { display: block; width: fit-content; min-width: 200px; text-align: center; padding: 13px 28px; background: transparent; color: white; border: 2px solid white; border-radius: 999px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; }
+.btn-ligacao:hover { background: white; color: #0A0F1C; }
+.demo-nota { color: rgba(255,255,255,0.5); font-size: 0.82rem; text-align: center; margin-top: 8px; }
+.demo-visual { border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #3b82f6, #6d28d9); min-height: 0; height: auto; aspect-ratio: 3/4; display: flex; align-items: flex-start; justify-content: center; font-size: 8rem; font-weight: 700; color: white; }
+
+@media (max-width: 768px) {
+  .grid-3-cols { grid-template-columns: repeat(2, 1fr); }
+  .two-columns { flex-direction: column; }
+  .counter-grid { grid-template-columns: repeat(2, 1fr); }
+  .cards-grid, .solucoes-grid, .recursos-grid, .precos-grid { grid-template-columns: 1fr; }
+  .faq-two-columns { grid-template-columns: 1fr; }
+  .demo-inner { grid-template-columns: 1fr; }
+  .panel-inner { padding: 60px 20px 40px; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo-container">
+    <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png"
+         alt="Humanos Digitais"
+         style="height:84px;width:auto;object-fit:contain;"
+         onerror="this.outerHTML='<div class=\'logo-icon\'>👤</div>'">
+    <div class="logo-text"><span>Humanos</span><span>Digitais</span></div>
+  </div>
+  <nav class="nav-links">
+    <a href="#plataforma">Plataforma</a>
+    <a href="#solucoes">Soluções</a>
+    <a href="#recursos">Recursos</a>
+    <a href="#precos">Preços</a>
+    <a href="#faq">FAQ</a>
+    <a href="#demonstracao" class="cta-button">Solicite uma Demonstração</a>
+  </nav>
+</header>
+
+<!-- AVATAR FLUTUANTE -->
+<div class="avatar-flutuante" id="avatarFlutuante">
+  <div class="avatar-header" id="avatarHeader">
+    <div class="avatar-icon-small" id="floatAvatarIcon">S</div>
+    <div class="avatar-info-small">
+      <h4 id="floatAvatarName">Sofia</h4>
+      <p id="floatAvatarRole">Atendimento</p>
+    </div>
+    <div class="demo-badge" id="demoBadge">DEMO</div>
+    <button class="minimize-btn" id="minimizeBtn">−</button>
+  </div>
+  <div class="avatar-body" id="avatarBody">
+    <div class="avatar-video-area">
+      <div class="avatar-placeholder" id="floatAvatarPlaceholder">
+        <span id="floatPlaceholderLetter">S</span>
+      </div>
+    </div>
+    <div class="chat-bubble-small" id="saudacaoMsg">Oi! Sou a Sofia, vamos conversar? 😊</div>
+    <div class="quick-replies-small" id="quickRepliesArea"></div>
+    <div class="avatar-input-overlay">
+      <input type="text" placeholder="Digite sua mensagem..." id="chatInput">
+      <div class="input-actions-small">
+        <button id="micBtn" title="Falar">🎤</button>
+        <button id="sendMessageBtn" title="Enviar">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 1 — HERO STICKY -->
+<section class="section-1">
+  <div class="hero">
+    <h1>
+      <div class="hero-line1">
+        <span class="static-text">Humanos Digitais</span>
+        <span class="dynamic-container">
+          <span class="dynamic-word active">Conversam</span>
+          <span class="dynamic-word">Orientam</span>
+          <span class="dynamic-word">Vendem</span>
+        </span>
+      </div>
+      <div class="hero-line2">Trabalham 24 Horas</div>
+    </h1>
+    <div class="hero-text">
+      <div class="linha">O futuro do atendimento não é um formulário. É uma <strong>conversa</strong>.</div>
+      <ul class="frases-lista">
+        <li>A primeira plataforma brasileira de humanos digitais</li>
+        <li>Especializados. Entendem seu negócio em minutos.</li>
+        <li>Transformam visitas em experiências interativas reais.</li>
+        <li>Resolvem problemas reais. 24 horas, 7 dias por semana.</li>
+      </ul>
+    </div>
+    <button class="cta-button-hero" onclick="abrirSofiaComCTA()">Converse com Sofia →</button>
+  </div>
+</section>
+
+<!-- SEÇÃO 2 — AVATARES (painel que sobe sobre a seção 1) -->
+<section class="content-panel" id="contentPanel">
+  <div class="floating-panel">
+    <div class="panel-inner">
+      <div class="panel-header">
+        <h2>Humanos Digitais</h2>
+        <div class="subtitulo">Seu site deixa visitantes sozinhos?</div>
+        <div class="descricao">Agora você pode ter um vendedor digital trabalhando 24 horas</div>
+      </div>
+      <div class="two-columns">
+        <div class="thumbnails-grid">
+          <div class="grid-3-cols" id="thumbnailGrid"></div>
+        </div>
+        <div class="main-avatar">
+          <div class="avatar-large" id="avatarLarge">S</div>
+          <div class="avatar-info">
+            <h3 id="avatarName">Sofia</h3>
+            <p class="role" id="avatarRole">Host da plataforma</p>
+          </div>
+          <div class="perguntas-box" id="perguntasBox">
+            <div class="perguntas-box-titulo">💡 Perguntas sugeridas</div>
+            <div id="perguntasLista"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 3 — PLATAFORMA / NÚMEROS -->
+<section class="content-panel platform-section" id="plataforma">
+  <div class="floating-panel">
+    <div class="panel-inner">
+      <div class="counter-title">Números que comprovam o impacto.</div>
+      <div class="counter-grid">
+        <div class="counter-card"><div class="counter-number" id="counter1">0x</div><div class="counter-label">Aumento em conversão de visitantes</div></div>
+        <div class="counter-card"><div class="counter-number" id="counter2">0h</div><div class="counter-label">Atendimento ininterrupto, todos os dias</div></div>
+        <div class="counter-card"><div class="counter-number" id="counter3">0%</div><div class="counter-label">Redução no custo de atendimento</div></div>
+        <div class="counter-card"><div class="counter-number" id="counter4">0%</div><div class="counter-label">Índice de satisfação dos usuários</div></div>
+        <div class="counter-card"><div class="counter-number" id="counter5">0x</div><div class="counter-label">Mais engajamento por visita</div></div>
+        <div class="counter-card"><div class="counter-number" id="counter6">0</div><div class="counter-label">Idiomas suportados nativamente</div></div>
+      </div>
+      <div class="counter-bottom-dark">
+        <div class="cards-grid">
+          <div class="feature-card"><span class="card-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Não é um chatbot. É um especialista digital.</h3><p>Humanos digitais são treinados com o conhecimento do seu negócio. Entendem o contexto da página visitada e agem no momento certo — sem esperar ser perguntados.</p></div>
+          <div class="feature-card"><span class="card-tag">SYNC-LIP REAL</span><h3>Fala, gesticula e conversa de verdade.</h3><p>Com tecnologia de Sync-lip real, nossos humanos digitais se expressam como pessoas reais. Criam conexão emocional com o visitante e transmitem confiança.</p></div>
+          <div class="feature-card"><span class="card-tag">INTEGRAÇÃO SIMPLES</span><h3>Integra em qualquer site em minutos.</h3><p>Um simples script é tudo que você precisa. Funciona em websites, quiosques físicos, apps mobile e plataformas digitais — sem desenvolvimento complexo.</p></div>
+          <div class="feature-card"><span class="card-tag">DADOS EM TEMPO REAL</span><h3>Cada conversa gera inteligência para o seu negócio.</h3><p>Nossa plataforma registra o que seus visitantes perguntam, onde duvidam e o que os convence. Insights reais para melhorar produtos e estratégia de vendas.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 4 — SOLUÇÕES -->
+<section class="content-panel solucoes-section" id="solucoes">
+  <div class="floating-panel">
+    <div class="panel-inner">
+      <div class="panel-header" style="text-align:center;">
+        <h2 style="color:#1E293B;">Humanos digitais para cada setor.</h2>
+        <div class="descricao" style="color:#334155;font-size:1.1rem;max-width:700px;margin:0 auto;">Especialistas treinados para resolver problemas reais em cada segmento.</div>
+      </div>
+      <div class="solucoes-grid" id="solucoesGrid"></div>
+      <div class="solucoes-cta"><a href="#demonstracao" class="btn-solucoes">Quero um humano digital para minha empresa →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 5 — RECURSOS -->
+<section class="content-panel recursos-section" id="recursos">
+  <div class="floating-panel">
+    <div class="panel-inner">
+      <div class="recursos-header">
+        <h2>Tecnologia que aprende.<br>Inteligência que converte.</h2>
+        <div class="subtitulo">Os recursos que fazem nossos humanos digitais serem únicos no mercado.</div>
+      </div>
+      <div class="recursos-grid">
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🧠</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">BASE DE CONHECIMENTO</span><h3>Aprende tudo sobre o seu negócio.</h3><p>Nossa tecnologia RAG treina o humano digital com os PDFs, documentos, catálogos e informações da sua empresa. Em minutos ele conhece seus produtos melhor que qualquer atendente recém-contratado.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">👁️</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">INTELIGÊNCIA CONTEXTUAL</span><h3>Age no momento certo. Sem esperar ser chamado.</h3><p>Nosso sistema detecta qual página o visitante está navegando e aborda com a mensagem certa no momento ideal.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">📊</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">GERAÇÃO DE LEADS</span><h3>Transforma conversas em oportunidades.</h3><p>Cada interação pode capturar dados do visitante. Leads qualificados entram automaticamente no seu CRM ou chegam via WhatsApp para sua equipe comercial.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">📈</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">ANALYTICS</span><h3>Cada pergunta é um dado valioso.</h3><p>Veja em tempo real o que seus visitantes perguntam, onde duvidam e quais produtos mais interessam. Inteligência de negócio que nenhum formulário consegue capturar.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🔌</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">INTEGRAÇÕES</span><h3>Conecta com o que você já usa.</h3><p>Integração nativa com CRM (HubSpot, Pipedrive, RD Station), WhatsApp Business API, Google Analytics e os principais sistemas do mercado.</p></div>
+        <div class="recurso-card"><div class="recurso-icon"><span class="recurso-emoji">🌐</span><img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/logo/logo_sem_fundo.png" alt="HD" onerror="this.style.display='none'"></div><span class="recurso-tag">13 IDIOMAS</span><h3>Fala com qualquer visitante. Em qualquer idioma.</h3><p>Inglês, Espanhol, Francês, Alemão, Italiano, Japonês, Mandarim, Árabe e mais 5 idiomas. Ideal para aeroportos, hotéis e plataformas internacionais.</p></div>
+      </div>
+      <div class="recursos-cta">
+        <a href="#precos" class="btn-primary">Ver planos e preços →</a>
+        <a href="#demonstracao" class="btn-outline-light">Solicitar demonstração</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6 — PREÇOS -->
+<section class="content-panel precos-section" id="precos">
+  <div class="floating-panel">
+    <div class="panel-inner">
+      <div class="precos-header">
+        <h2>Planos simples. Resultados reais.</h2>
+        <div class="subtitulo">Sem cobrança por mensagem. Preço fixo. Cancele quando quiser.</div>
+        <div class="precos-nota">Todos os planos incluem 7 dias de teste gratuito. Aceitamos Pix, cartão ou créditos mensais.</div>
+      </div>
+      <div class="precos-grid">
+        <div class="preco-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-desc">Para empresas que querem experimentar o poder de um humano digital.</div>
+          <div class="plan-price">R$ 497<small>/mês</small></div>
+          <div class="price-note">Equivale a R$ 16/dia. Menos que um atendente.</div>
+          <a href="#demonstracao" class="btn-plan">Começar gratuitamente →</a>
+          <ul class="features-list">
+            <li>1 humano digital especializado</li>
+            <li>Respostas pré-programadas por setor</li>
+            <li>Integração por script em qualquer site</li>
+            <li>Até 500 interações/mês</li>
+            <li>Relatório mensal de desempenho</li>
+            <li>Suporte por email</li>
+            <li>✅ 7 dias de teste gratuito</li>
+            <li>✅ Aceita Pix, cartão ou créditos mensais</li>
+            <li class="not-included">IA treinada com seus dados</li>
+            <li class="not-included">Captura automática de leads</li>
+            <li class="not-included">Integração WhatsApp</li>
+          </ul>
+        </div>
+        <div class="preco-card" style="border:2px solid #1A56DB;box-shadow:0 8px 32px rgba(26,86,219,0.2);">
+          <div class="popular-badge">MAIS POPULAR</div>
+          <div class="plan-name" style="margin-top:0.5rem;">Profissional</div>
+          <div class="plan-desc">Para empresas que querem resultados reais em conversão e atendimento.</div>
+          <div class="plan-price">R$ 997<small>/mês</small></div>
+          <div class="price-note">Menos que um funcionário CLT de jornada parcial. Trabalha 24h.</div>
+          <a href="#demonstracao" class="btn-plan">Solicitar demonstração →</a>
+          <ul class="features-list">
+            <li>1 humano digital com IA treinada no seu negócio</li>
+            <li>RAG: aprende com seus PDFs e documentos</li>
+            <li>Captura automática de leads qualificados</li>
+            <li>Dashboard de analytics em tempo real</li>
+            <li>Até 2.000 interações/mês</li>
+            <li>Integração com CRM (HubSpot, RD Station)</li>
+            <li>Detecção contextual de página visitada</li>
+            <li>Suporte humano via chat</li>
+            <li>✅ 7 dias de teste gratuito</li>
+            <li>✅ Aceita Pix, cartão ou créditos mensais</li>
+            <li class="not-included">Múltiplos avatares</li>
+            <li class="not-included">Integração WhatsApp Business</li>
+          </ul>
+        </div>
+        <div class="preco-card" style="border:2px solid #7C3AED;">
+          <div style="background:#7C3AED;color:white;position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:999px;">PARA EQUIPES</div>
+          <div class="plan-name" style="margin-top:1rem;">Business</div>
+          <div class="plan-desc">Para empresas com múltiplos segmentos e alto volume de atendimento.</div>
+          <div class="plan-price">R$ 1.997<small>/mês</small></div>
+          <div class="price-note">3 especialistas digitais pelo custo de menos de 1 funcionário.</div>
+          <a href="#demonstracao" class="btn-plan" style="background:#7C3AED;">Falar com especialista →</a>
+          <ul class="features-list">
+            <li>Até 3 humanos digitais especializados</li>
+            <li>IA treinada por avatar/segmento</li>
+            <li>✦ Continuidade no WhatsApp — mesmo especialista do site continua no WhatsApp do cliente<span class="whatsapp-highlight">★ Avatar no site + IA no WhatsApp no mesmo produto</span></li>
+            <li>Captura e qualificação de leads avançada</li>
+            <li>Até 5.000 interações/mês</li>
+            <li>Suporte prioritário</li>
+            <li>✅ 7 dias de teste gratuito</li>
+            <li>✅ Aceita Pix, cartão ou créditos mensais</li>
+          </ul>
+        </div>
+        <div class="enterprise-card-white">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-desc">Para grandes operações que exigem escala e personalização total.</div>
+          <ul class="features-list" style="margin-bottom:1.5rem;">
+            <li>Avatares totalmente customizados</li>
+            <li>Quiosques físicos (shopping, aeroporto, hospital)</li>
+            <li>Múltiplos idiomas (até 13)</li>
+            <li>API dedicada e SLA garantido</li>
+            <li>Integração com sistemas legados</li>
+            <li>Treinamento da equipe incluído</li>
+            <li>Gerente de conta dedicado</li>
+            <li>✅ Condições especiais de pagamento</li>
+          </ul>
+          <a href="#demonstracao" class="btn-plan">Solicitar proposta personalizada →</a>
+        </div>
+      </div>
+      <div class="cta-banner">
+        <h3>7 dias grátis. Sem cartão de crédito.</h3>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+          <span style="background:rgba(255,255,255,0.15);border-radius:999px;padding:5px 14px;font-size:0.82rem;font-weight:600;">💳 Cartão</span>
+          <span style="background:rgba(255,255,255,0.15);border-radius:999px;padding:5px 14px;font-size:0.82rem;font-weight:600;">🔑 Pix</span>
+          <span style="background:rgba(255,255,255,0.15);border-radius:999px;padding:5px 14px;font-size:0.82rem;font-weight:600;">🎟️ Créditos mensais</span>
+          <span style="background:rgba(255,255,255,0.15);border-radius:999px;padding:5px 14px;font-size:0.82rem;font-weight:600;">📅 Mês avulso</span>
+        </div>
+        <a href="#demonstracao" class="btn-white">Começar agora →</a>
+        <p>Cancele quando quiser. Sem compromisso.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 7 — FAQ -->
+<section class="content-panel" id="faq">
+  <div class="floating-panel" style="background:#F8FAFF;">
+    <div class="panel-inner">
+      <div class="faq-section-full">
+        <div class="faq-two-columns">
+          <div class="faq-left">
+            <h2>Você provavelmente<br>tem algumas perguntas.</h2>
+            <p>A Sofia pode responder aqui — por escrito. Ou ao vivo, pelo ícone no canto inferior direito.</p>
+            <div class="sofia-image">
+              <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/estaticas/01-sofia-principal.png"
+                   alt="Sofia — Host da plataforma"
+                   class="faq-sofia-img"
+                   onerror="this.style.display='none';this.parentElement.querySelector('.sofia-fallback').style.display='flex';">
+              <div class="sofia-fallback" style="display:none;width:100%;min-height:300px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#6d28d9);align-items:center;justify-content:center;font-size:6rem;font-weight:700;color:white;">S</div>
+            </div>
+            <div class="note">💬 Prefere ouvir? Clique na Sofia no canto direito e pergunte diretamente.</div>
+          </div>
+          <div class="faq-right">
+            <div class="faq-item-full"><div class="faq-question-full">O que exatamente é um humano digital?<span class="icon">▸</span></div><div class="faq-answer-full">Um humano digital é um avatar conversacional com rosto, voz e expressão, treinado com o conhecimento do seu negócio. Ele fala, gesticula e responde em tempo real — não é um chatbot de texto, nem um vídeo gravado. É uma presença digital viva que atende seus visitantes como um especialista real faria.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">É a mesma coisa que um chatbot?<span class="icon">▸</span></div><div class="faq-answer-full">Não — e essa é a diferença mais importante. Um chatbot responde texto numa janelinha. Um humano digital fala, olha, expressa emoção e cria conexão. A tecnologia de Sync-lip sincroniza lábios, voz e expressão em tempo real.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Como o humano digital aprende sobre minha empresa?<span class="icon">▸</span></div><div class="faq-answer-full">Através da nossa tecnologia RAG. Você envia seus PDFs, catálogos, manuais e site. Em minutos, o humano digital absorve tudo e passa a responder com precisão sobre o seu negócio — como um funcionário que estudou profundamente a empresa antes de começar.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Quanto tempo leva para implementar?<span class="icon">▸</span></div><div class="faq-answer-full">O plano Starter pode ser ativado em até 48 horas. O Profissional, com treinamento RAG, leva de 5 a 10 dias úteis. O Business, com múltiplos avatares e integração WhatsApp, tem prazo de até 15 dias úteis para configuração completa.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Funciona no celular?<span class="icon">▸</span></div><div class="faq-answer-full">Sim. O humano digital é responsivo e funciona em smartphones, tablets e desktops sem nenhuma adaptação técnica. No plano Business, ele também continua atendendo pelo WhatsApp do seu cliente, mantendo o contexto da conversa iniciada no site.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Preciso de equipe técnica para gerenciar?<span class="icon">▸</span></div><div class="faq-answer-full">Não. Nossa plataforma permite que qualquer pessoa da equipe adicione documentos, ajuste respostas e acompanhe relatórios sem programar. Para a integração inicial, nossa equipe realiza o setup completo.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">O humano digital atende em outros idiomas?<span class="icon">▸</span></div><div class="faq-answer-full">Sim. Suportamos até 13 idiomas nativamente — inglês, espanhol, francês, alemão, italiano, japonês, mandarim e mais. Ideal para aeroportos, hotéis e empresas com atendimento internacional.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Posso ter o humano digital em quiosque físico?<span class="icon">▸</span></div><div class="faq-answer-full">Sim — e essa é uma das nossas funcionalidades exclusivas no Brasil. O humano digital pode operar em quiosques em shoppings, aeroportos, hospitais e universidades em telas touchscreen. Disponível no plano Enterprise.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Como funciona o teste gratuito?<span class="icon">▸</span></div><div class="faq-answer-full">Todos os planos incluem 7 dias de teste gratuito, sem cartão de crédito e sem compromisso. Aceitamos Pix, cartão de crédito, débito ou compra de créditos mensais. Você já pode treinar o humano digital com os dados da sua empresa e ver resultados reais antes de qualquer investimento.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">O humano digital substitui minha equipe?<span class="icon">▸</span></div><div class="faq-answer-full">Complementa — não substitui. Ele resolve atendimentos repetitivos e qualificação de leads 24 horas. Sua equipe humana foca nos casos que exigem julgamento e negociação profunda. O resultado é uma operação mais eficiente com muito menos custo.</div></div>
+            <div class="faq-item-full"><div class="faq-question-full">Qual a diferença entre os planos?<span class="icon">▸</span></div><div class="faq-answer-full">O Starter usa respostas pré-programadas. O Profissional tem IA treinada com seus dados. O Business adiciona múltiplos avatares e WhatsApp. O Enterprise é sob medida, com quiosques físicos e suporte dedicado. Todos incluem 7 dias grátis e aceitam Pix, cartão ou créditos mensais.</div></div>
+          </div>
+        </div>
+        <div class="faq-cta">
+          <h3>Ainda tem dúvidas? A Sofia responde agora.</h3>
+          <a href="#" class="btn-white" id="openSofiaWidget">Perguntar para a Sofia →</a>
+          <div class="small-text">Ou fale com um especialista: <a href="#demonstracao">Solicitar demonstração</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8 — DEMONSTRAÇÃO -->
+<section class="demo-section" id="demonstracao">
+  <div class="demo-inner">
+    <div class="demo-text">
+      <h2>Pronto para ter um especialista digital no seu site?</h2>
+      <div class="subtitle">A Sofia vai orientar você durante o teste — e já demonstra ao vivo como funciona.</div>
+
+      <!-- ONBOARDING STEPS -->
+      <div class="steps-list">
+        <div class="step-item"><div class="step-num">1</div>🌐 Informe o site da sua empresa — Sofia aprende sobre seu negócio</div>
+        <div class="step-item"><div class="step-num">2</div>📄 Adicione links, redes sociais, PDFs ou descreva o que precisa</div>
+        <div class="step-item"><div class="step-num">3</div>💬 A Sofia orienta e demonstra ao vivo como o avatar vai trabalhar</div>
+        <div class="step-item"><div class="step-num">4</div>✅ Em 7 dias você vê o resultado real — sem cartão de crédito</div>
+      </div>
+
+      <!-- ONBOARDING FORM -->
+      <div class="onboarding-box" id="onboardingBox">
+        <div class="onboarding-titulo">Conte um pouco sobre sua empresa:</div>
+        <input type="url" id="inputSite" placeholder="🌐 URL do seu site (ex: minhaempresa.com.br)" class="onboarding-input">
+        <input type="text" id="inputRedes" placeholder="📱 Links de redes sociais (Instagram, LinkedIn...)" class="onboarding-input">
+        <input type="text" id="inputSegmento" placeholder="🏢 Segmento ou descrição breve do que você precisa" class="onboarding-input">
+        <div class="onboarding-upload-hint">📎 No WhatsApp você também poderá enviar PDFs, vídeos ou documentos de produto</div>
+        <div class="botoes-cta" style="margin-top:16px;">
+          <a id="btnWhatsappOnboarding" href="#" class="btn-whatsapp" onclick="montarLinkWhatsApp(event)">Iniciar teste grátis com a Sofia →</a>
+          <a href="https://wa.me/5511XXXXXXXXX?text=Quero+saber+mais+sobre+planos+e+pagamento" target="_blank" class="btn-ligacao">Falar sobre planos e pagamento</a>
+        </div>
+      </div>
+
+      <!-- FORMAS DE PAGAMENTO -->
+      <div class="pagamentos-box">
+        <div class="pagamentos-titulo">Formas de pagamento aceitas:</div>
+        <div class="pagamentos-tags">
+          <span class="pay-tag">🔑 Pix</span>
+          <span class="pay-tag">💳 Cartão de crédito</span>
+          <span class="pay-tag">🎟️ Créditos mensais</span>
+          <span class="pay-tag">📅 Mês avulso</span>
+        </div>
+        <div class="pagamentos-nota">Sem assinatura obrigatória. Pague como preferir.</div>
+      </div>
+
+      <div class="demo-nota">Nosso especialista em implementação entrará em contato em até 2 horas úteis.<br>Atendemos comércio, indústria, serviços, turismo e e-commerce.</div>
+    </div>
+
+    <!-- SOFIA IMAGE PLACEHOLDER -->
+    <div class="demo-visual" id="demoSofiaVisual">
+      <img src="https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/estaticas/01-sofia-principal.png"
+           alt="Sofia — Host da plataforma"
+           style="width:100%;height:100%;object-fit:cover;object-position:top center;border-radius:20px;display:block;"
+           onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+      <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:8rem;font-weight:700;color:white;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#06b6d4);">S</div>
+    </div>
+  </div>
+</section>
+
+<!-- VERCEL FORCE REBUILD: 2026-03-24T18:05:00Z -->
+<script>
+// ========== BACKEND TTS ==========
+// Backend TTS com HTTPS nativo no Render
+window.HD_BACKEND_URL = 'https://atti-media-server.onrender.com';
+// Vercel Force Rebuild: 2026-03-24 18:00
+
+// ========== DADOS DOS AVATARES ==========
+const GH_BASE = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
+const avatars = [
+  { name:"Sofia", role:"Host da plataforma", shortRole:"Atendimento", genero:"feminino", color:"linear-gradient(135deg,#3b82f6,#06b6d4)", initials:"S", principal:"01-sofia-principal.png", synclip:"01-sofia-synclip.png", saudacao:"Oi! Sou a Sofia, vamos conversar? 😊", perguntas:["O que são humanos digitais?","Como funciona no meu site?","Quais segmentos vocês atendem?","Qual a diferença para um chatbot?","Como solicitar para minha empresa?"] },
+  { name:"Rafael", role:"Especialista em Substituição Tributária", shortRole:"Tributário", genero:"masculino", color:"linear-gradient(135deg,#2563eb,#3b82f6)", initials:"R", principal:"02-rafael-principal.png", synclip:"02-rafael-synclip.png", saudacao:"Oi! Sou o Rafael, especialista tributário. Como posso ajudar? 💼", perguntas:["O que é substituição tributária?","Como funciona o ICMS-ST?","Quais setores são afetados?","Como regularizar pendências fiscais?","Posso parcelar débitos tributários?"] },
+  { name:"Clara", role:"Consultora Hospitalar", shortRole:"Saúde", genero:"feminino", color:"linear-gradient(135deg,#10b981,#34d399)", initials:"C", principal:"03-clara-principal.png", synclip:"03-clara-synclip.png", saudacao:"Olá! Sou a Clara, consultora hospitalar. Em que posso ajudar? 🏥", perguntas:["Quais especialidades o hospital possui?","Como agendar uma consulta?","O hospital atende convênios?","Onde fica a emergência?","Quais horários de atendimento?"] },
+  { name:"Lucas", role:"Consultor Automotivo", shortRole:"Automotivo", genero:"masculino", color:"linear-gradient(135deg,#8b5cf6,#a855f7)", initials:"L", principal:"04-lucas-principal.png", synclip:"04-lucas-synclip.png", saudacao:"E aí! Sou o Lucas, consultor automotivo. Bora conversar? 🚗", perguntas:["Qual a diferença entre os modelos?","Tem financiamento disponível?","Qual o consumo do veículo?","Posso agendar um test drive?","Vocês aceitam carro na troca?"] },
+  { name:"Amanda", role:"Recepcionista de Hotel", shortRole:"Hotelaria", genero:"feminino", color:"linear-gradient(135deg,#f59e0b,#fbbf24)", initials:"A", principal:"05-amanda-principal.png", synclip:"05-amanda-synclip.png", saudacao:"Olá! Sou a Amanda, recepcionista. Bem-vindo, como posso ajudar? 🏨", perguntas:["Quais acomodações estão disponíveis?","Como fazer check-in?","O hotel tem restaurante?","Tem estacionamento?","Qual o horário do café da manhã?"] },
+  { name:"Fernanda", role:"Atendente Municipal", shortRole:"Municipal", genero:"feminino", color:"linear-gradient(135deg,#6366f1,#818cf8)", initials:"F", principal:"06-fernanda-principal.png", synclip:"06-fernanda-synclip.png", saudacao:"Olá! Sou a Fernanda, atendente municipal. O que precisa? 🏛", perguntas:["Como emitir segunda via do IPTU?","Onde fica a secretaria de saúde?","Como abrir um protocolo?","Quais horários de atendimento?","Como solicitar alvará?"] },
+  { name:"Marina", role:"Atendente de Shopping", shortRole:"Varejo", genero:"feminino", color:"linear-gradient(135deg,#f43f5e,#f472b6)", initials:"M", principal:"07-marina-principal.png", synclip:"07-marina-synclip.png", saudacao:"Oi! Sou a Marina, seu guia no shopping. Posso ajudar? 🛍", perguntas:["Onde fica a loja X?","Quais restaurantes têm aqui?","Como chegar ao estacionamento?","Tem alguma promoção hoje?","Onde fica a praça de alimentação?"] },
+  { name:"Roberto", role:"Consultor de Energia Solar", shortRole:"Energia", genero:"masculino", color:"linear-gradient(135deg,#f97316,#fb923c)", initials:"R", principal:"08-roberto-principal.png", synclip:"08-roberto-synclip.png", saudacao:"Oi! Sou o Roberto. Vamos falar sobre energia solar? ☀️", perguntas:["Qual a economia com energia solar?","Quanto tempo leva a instalação?","Posso financiar o sistema?","Qual o retorno do investimento?","Funciona em dias nublados?"] },
+  { name:"Luisa", role:"Mentora Educacional", shortRole:"Educação", genero:"feminino", color:"linear-gradient(135deg,#059669,#10b981)", initials:"L", principal:"09-luisa-principal.png", synclip:"09-luisa-synclip.png", saudacao:"Olá! Sou a Luisa, mentora educacional. Qual sua dúvida? 🎓", perguntas:["Quais cursos estão disponíveis?","Como é o processo de inscrição?","Existem bolsas de estudo?","Como funciona o EAD?","Qual o valor da mensalidade?"] },
+  { name:"Laís", role:"Orientadora Acadêmica — Medicina", shortRole:"Medicina", genero:"feminino", color:"linear-gradient(135deg,#0891b2,#06b6d4)", initials:"L", principal:"10-lais-principal.png", synclip:"10-lais-synclip.png", saudacao:"Oi! Sou a Laís, orientadora de medicina. Vamos conversar? 🩺", perguntas:["Como funciona o internato médico?","Quais especialidades disponíveis?","Como me preparar para a residência?","O que é o CRM médico?","Qual a diferença entre clínica e cirurgia?"] },
+  { name:"Paula", role:"Atendente Odontológica", shortRole:"Odontologia", genero:"feminino", color:"linear-gradient(135deg,#ec4899,#f472b6)", initials:"P", principal:"11-paula-principal.png", synclip:"11-paula-synclip.png", saudacao:"Olá! Sou a Paula, atendente odontológica. Como posso ajudar? 😁", perguntas:["Quais tratamentos estão disponíveis?","Vocês atendem convênios?","Como agendar uma consulta?","Quanto custa um clareamento?","Vocês fazem implantes?"] },
+  { name:"Bruno", role:"Tricolouco — Torcedor Fanático do São Paulo", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#dc2626,#b91c1c)", initials:"B", principal:"12-bruno-principal.png", synclip:"12-bruno-synclip.png", saudacao:"E aí, tricolor! Sou o Bruno, Tricolouco! Bora falar de futebol? ⚽", perguntas:["Como foi o último jogo do SPFC?","Qual o melhor jogador do time?","Quando é o próximo clássico?","Qual a história do São Paulo?","Me conta uma curiosidade do clube?"] },
+  { name:"Giovana", role:"Tricolinda — Torcedora Apaixonada do São Paulo", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#be185d,#ec4899)", initials:"G", principal:"13-giovana-principal.png", synclip:"13-giovana-synclip.png", saudacao:"Oi! Sou a Giovana, Tricolinda e apaixonada pelo São Paulo! 🔴⚪🔵", perguntas:["Qual o título mais importante do SPFC?","Quem é a lenda do clube?","Quando foi fundado o São Paulo?","Como é o Morumbi?","Me fala do Rogério Ceni?"] },
+  { name:"Marcos", role:"Fiel da ZL — Torcedor Corinthiano", shortRole:"Entretenimento", genero:"masculino", color:"linear-gradient(135deg,#111827,#374151)", initials:"M", principal:"14-marcos-principal.png", synclip:"14-marcos-synclip.png", saudacao:"Salve Fiel! Sou o Marcos, corinthiano da ZL! Pode falar! 🖤🤍", perguntas:["Como foi o Mundial do Corinthians?","Quem é o maior ídolo da Fiel?","Qual o maior rival do Timão?","Me conta sobre a Neo Química Arena?","Qual o hino do Corinthians?"] },
+  { name:"Carol", role:"Bandona — Torcedora Corinthiana", shortRole:"Entretenimento", genero:"feminino", color:"linear-gradient(135deg,#1f2937,#4b5563)", initials:"C", principal:"15-carol-principal.png", synclip:"15-carol-synclip.png", saudacao:"Oi! Sou a Carol, Bandona e Fiel até o fim! Vamos torcer juntos? 🖤🤍", perguntas:["Qual o título mais emocionante do Corinthians?","Como surgiu a Fiel Torcida?","Quem são as lendas femininas do clube?","Me fala da conquista da Libertadores?","O que significa ser corintiano?"] },
+  { name:"Sua Empresa", role:"Comércio · Indústria · Serviços · Turismo · E-commerce", shortRole:"Personalizado", genero:"neutro", color:"linear-gradient(135deg,#1A56DB,#3b82f6)", initials:"★", principal:null, synclip:null, saudacao:"Olá! Posso mostrar como um humano digital pode transformar sua empresa. Vamos conversar? 🚀", perguntas:["Que tipo de empresa pode ter um humano digital?","Como personalizo o avatar para minha marca?","Quanto tempo leva a implementação?","Funciona para e-commerce também?","Como solicitar uma demonstração?"] }
+];
+
+const solucoesCards = [
+  { titulo:"Seu vendedor digital que nunca dorme.", texto:"Atende visitantes em sites de e-commerce e B2B 24 horas por dia. Apresenta produtos, responde objeções, qualifica leads e direciona para o checkout — sem equipe adicional.", tag:"VENDAS DIGITAIS", avatarIndex:7 },
+  { titulo:"Recepção inteligente para hospitais e clínicas.", texto:"Orienta pacientes sobre especialidades, convênios aceitos e procedimentos. Agenda consultas, reduz filas e melhora a experiência do paciente desde o primeiro contato.", tag:"SAÚDE", avatarIndex:2 },
+  { titulo:"Consultor automotivo disponível 24h.", texto:"Apresenta veículos, compara modelos, simula financiamentos e agenda test drives. O cliente avança no processo de compra mesmo fora do horário comercial.", tag:"AUTOMOTIVO", avatarIndex:3 },
+  { titulo:"Recepcionista e concierge digital.", texto:"Informa sobre acomodações, tarifas e serviços. Facilita check-in, recomenda restaurantes e atrativos locais — criando uma experiência premium desde a reserva.", tag:"HOTELARIA", avatarIndex:4 },
+  { titulo:"Atendimento cidadão sem filas.", texto:"Orienta sobre documentos, serviços municipais, protocolos e horários. Disponível 24h, reduz a carga das centrais de atendimento e melhora a satisfação do cidadão.", tag:"SERVIÇO PÚBLICO", avatarIndex:5 },
+  { titulo:"Guia interativo para cada visitante.", texto:"Localiza lojas, informa promoções, horários e eventos. Melhora a experiência no shopping e aumenta o tempo de permanência e o ticket médio dos visitantes.", tag:"VAREJO", avatarIndex:6 },
+  { titulo:"Assistência em qualquer idioma, em tempo real.", texto:"Orienta passageiros sobre portões, embarque, serviços e conexões em 13 idiomas. Reduz estresse, melhora fluxo operacional e eleva a satisfação dos passageiros.", tag:"MULTILÍNGUE · 13 IDIOMAS", avatarIndex:0 },
+  { titulo:"Mentora digital para cada estudante.", texto:"Informa sobre cursos, processos seletivos, bolsas e grade curricular. Apoia a jornada do candidato à matrícula e reduz a evasão por falta de informação.", tag:"EDUCAÇÃO", avatarIndex:8 },
+  { titulo:"Do interesse à proposta em minutos.", texto:"Apresenta soluções, calcula retorno do investimento e agenda visitas técnicas. Qualifica leads e acelera o ciclo de vendas sem depender de equipe comercial presencial.", tag:"ENERGIA", avatarIndex:7 },
+  { titulo:"Torcedores digitais que vibram com os fãs.", texto:"Humanos digitais apaixonados pelo time que interagem, comentam jogadas e criam conexão emocional com torcedores. Presença digital que gera engajamento real.", tag:"ENTRETENIMENTO", avatarIndex:11 }
+];
+
+// ========== ESTADO ==========
+let selectedAvatarIndex = 0;
+let interactionCount = 0;
+let autoReturnTimer = null;
+let ctaModeActive = false;
+let ctaStep = 0;
+
+// ========== VOZ / TTS ==========
+window.__hdPendingAudioBase64 = null;
+window.__hdPendingAudioMime = 'audio/mp3';
+
+function sanitizeSpeechText(text) {
+  return String(text || '')
+    .replace(/\s+/g, ' ')
+    .replace(/[😊🏥🚗🏨🏛🛍☀️🎓🩺😁⚽🔴⚪🔵🖤🤍🚀💼]/g, '')
+    .trim();
+}
+
+function getAvatarIdFromName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9_-]/g, '');
+}
+
+async function playBase64Audio(audioBase64, mimeType = 'audio/mp3') {
+  if (!audioBase64 || audioBase64.length < 100) {
+    throw new Error('audio_base64 ausente ou muito curto');
+  }
+
+  const audio = new Audio(`data:${mimeType};base64,${audioBase64}`);
+  audio.preload = 'auto';
+
+  try {
+    await audio.play();
+    window.__hdPendingAudioBase64 = null;
+    return true;
+  } catch (error) {
+    window.__hdPendingAudioBase64 = audioBase64;
+    window.__hdPendingAudioMime = mimeType;
+    console.warn('Autoplay bloqueado; áudio será tentado no próximo clique.', error);
+    return false;
+  }
+}
+
+async function retryPendingAudio() {
+  if (!window.__hdPendingAudioBase64) return;
+  const pending = window.__hdPendingAudioBase64;
+  const mime = window.__hdPendingAudioMime || 'audio/mp3';
+  try {
+    await playBase64Audio(pending, mime);
+  } catch (error) {
+    console.warn('Falha ao tocar áudio pendente.', error);
+  }
+}
+
+document.addEventListener('click', retryPendingAudio, { passive: true });
+document.addEventListener('touchstart', retryPendingAudio, { passive: true });
+
+async function falarAvatar(avatarId, texto, emotion = 'friendly') {
+  const cleanAvatarId = getAvatarIdFromName(avatarId);
+  const cleanText = sanitizeSpeechText(texto);
+
+  if (!cleanAvatarId) throw new Error('avatarId inválido');
+  if (!cleanText) throw new Error('Texto vazio para TTS');
+
+  // AllOrigins /get endpoint requer query param
+  const isAllOrigins = window.HD_BACKEND_URL.includes('allorigins');
+  const targetUrl = isAllOrigins 
+    ? window.HD_BACKEND_URL.replace('?url=', '?url=') + '/api/avatar/speak'
+    : window.HD_BACKEND_URL + '/api/avatar/speak';
+  
+  const response = await fetch(targetUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      avatar_id: cleanAvatarId,
+      text: cleanText,
+      emotion: emotion || 'friendly'
+    })
+  });
+
+  let data = null;
+  try {
+    const json = await response.json();
+    // Se for resposta do AllOrigins, extrair do .contents
+    if (json.contents) {
+      data = typeof json.contents === 'string' ? JSON.parse(json.contents) : json.contents;
+    } else {
+      data = json;
+    }
+  } catch (error) {
+    throw new Error('Resposta inválida do backend TTS');
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
+  }
+
+  if (!data?.audio_base64) {
+    throw new Error('Backend não retornou audio_base64');
+  }
+
+  await playBase64Audio(data.audio_base64, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3');
+  return data;
+}
+
+async function saudarAvatar(avatarId) {
+  const cleanAvatarId = getAvatarIdFromName(avatarId);
+  const avatar = avatars.find(item => getAvatarIdFromName(item.name) === cleanAvatarId);
+  if (!avatar) throw new Error(`Avatar não encontrado: ${avatarId}`);
+  return falarAvatar(cleanAvatarId, avatar.saudacao, 'friendly');
+}
+
+window.falarAvatar = falarAvatar;
+window.saudarAvatar = saudarAvatar;
+
+// ========== ELEMENTOS ==========
+const thumbnailGrid = document.getElementById('thumbnailGrid');
+const avatarLarge = document.getElementById('avatarLarge');
+const avatarName = document.getElementById('avatarName');
+const avatarRole = document.getElementById('avatarRole');
+const floatAvatarIcon = document.getElementById('floatAvatarIcon');
+const floatAvatarName = document.getElementById('floatAvatarName');
+const floatAvatarRole = document.getElementById('floatAvatarRole');
+const floatPlaceholderLetter = document.getElementById('floatPlaceholderLetter');
+const floatAvatarPlaceholder = document.getElementById('floatAvatarPlaceholder');
+const demoBadge = document.getElementById('demoBadge');
+const sendBtn = document.getElementById('sendMessageBtn');
+const chatInput = document.getElementById('chatInput');
+const saudacaoMsg = document.getElementById('saudacaoMsg');
+const quickRepliesArea = document.getElementById('quickRepliesArea');
+const perguntasBox = document.getElementById('perguntasBox');
+const perguntasLista = document.getElementById('perguntasLista');
+
+function limparQuickReplies() { quickRepliesArea.innerHTML = ''; }
+
+function mostrarPerguntasMainArea(avatar) {
+  if (!perguntasBox || !perguntasLista) return;
+  if (avatar.perguntas && avatar.perguntas.length > 0 && avatar.name !== 'Sofia') {
+    perguntasLista.innerHTML = '';
+    avatar.perguntas.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'pergunta-item';
+      item.textContent = p;
+      item.onclick = () => {
+        handleInteraction();
+        // Remove esta pergunta visualmente
+        item.style.opacity = '0.4';
+        item.style.pointerEvents = 'none';
+      };
+      perguntasLista.appendChild(item);
+    });
+    perguntasBox.classList.add('visivel');
+  } else {
+    perguntasBox.classList.remove('visivel');
+    perguntasLista.innerHTML = '';
+  }
+}
+
+function abrirSofiaComCTA() {
+  const fl = document.getElementById('avatarFlutuante');
+  if (fl.classList.contains('minimized')) { fl.classList.remove('minimized'); document.getElementById('minimizeBtn').textContent = '−'; }
+  if (selectedAvatarIndex !== 0) { ctaModeActive = false; updateSelectedAvatar(0); }
+  ctaModeActive = true;
+  ctaStep = 0;
+  saudacaoMsg.textContent = "Olá! 😊 Estou aqui para conectar você com nosso especialista. Me diz: qual é o segmento da sua empresa?";
+  limparQuickReplies();
+  ["Comércio/Varejo","Saúde/Hospitais","Serviços/Turismo","Indústria/B2B","E-commerce"].forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-reply-btn';
+    btn.textContent = s;
+    btn.onclick = () => { saudacaoMsg.textContent = `Perfeito! Para soluções em ${s}, nosso especialista entrará em contato em breve. Me passa seu WhatsApp?`; limparQuickReplies(); ctaStep = 1; };
+    quickRepliesArea.appendChild(btn);
+  });
+}
+
+function resetAutoReturnTimer() {
+  if (autoReturnTimer) clearTimeout(autoReturnTimer);
+  if (selectedAvatarIndex !== 0) {
+    autoReturnTimer = setTimeout(() => { if (selectedAvatarIndex !== 0) { updateSelectedAvatar(0); interactionCount = 0; } }, 45000);
+  }
+}
+
+function updateSelectedAvatar(index) {
+  selectedAvatarIndex = index;
+  const avatar = avatars[index];
+  const GH = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
+
+  // ── AVATAR GRANDE CENTRAL (usa img_principal) ──
+  avatarLarge.innerHTML = '';
+  if (avatar.principal) {
+    const img = document.createElement('img');
+    img.src = GH + 'estaticas/' + avatar.principal;
+    img.alt = avatar.name;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;display:block;';
+    img.onerror = () => {
+      avatarLarge.innerHTML = '';
+      avatarLarge.textContent = avatar.initials;
+      avatarLarge.style.background = avatar.color;
+    };
+    avatarLarge.appendChild(img);
+    avatarLarge.style.background = 'none';
+  } else {
+    avatarLarge.textContent = avatar.initials;
+    avatarLarge.style.background = avatar.color;
+  }
+
+  avatarName.textContent = avatar.name;
+  avatarRole.textContent = avatar.role;
+  floatAvatarIcon.textContent = avatar.initials;
+  floatAvatarName.textContent = avatar.name;
+  floatAvatarRole.textContent = avatar.shortRole;
+
+  // ── WIDGET CANTO INFERIOR DIREITO (usa img_synclip) ──
+  floatAvatarPlaceholder.innerHTML = '';
+  if (avatar.synclip) {
+    const fImg = document.createElement('img');
+    fImg.src = GH + 'synclip/' + avatar.synclip;
+    fImg.alt = avatar.name;
+    fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    fImg.onerror = () => {
+      floatAvatarPlaceholder.innerHTML = '';
+      const sp = document.createElement('span');
+      sp.id = 'floatPlaceholderLetter';
+      sp.textContent = avatar.initials;
+      floatAvatarPlaceholder.appendChild(sp);
+      floatAvatarPlaceholder.style.background = avatar.color;
+    };
+    floatAvatarPlaceholder.appendChild(fImg);
+    floatAvatarPlaceholder.style.background = 'none';
+  } else {
+    const sp = document.createElement('span');
+    sp.textContent = avatar.initials;
+    floatAvatarPlaceholder.appendChild(sp);
+    floatAvatarPlaceholder.style.background = avatar.color;
+  }
+
+  // Saudação no widget
+  if (!ctaModeActive) {
+    saudacaoMsg.textContent = avatar.saudacao;
+    limparQuickReplies();
+  }
+
+  // Perguntas no painel principal abaixo do avatar grande
+  mostrarPerguntasMainArea(avatar);
+
+  if (index !== 0) demoBadge.classList.add('active');
+  else { demoBadge.classList.remove('active'); if (!ctaModeActive) limparQuickReplies(); }
+
+  document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
+    if (i === index) { btn.classList.add('selected'); btn.querySelector('.thumbnail-name').style.color = '#1a1a1a'; }
+    else { btn.classList.remove('selected'); btn.querySelector('.thumbnail-name').style.color = '#6b7280'; }
+  });
+  interactionCount = 0;
+  resetAutoReturnTimer();
+
+  // ── TOCAR SAUDAÇÃO COM VOZ ──
+  const avatarIdTTS = avatar.name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  setTimeout(() => {
+    if (typeof window.saudarAvatar === 'function') {
+      window.saudarAvatar(avatarIdTTS);
+    } else if (window.HD_BACKEND_URL) {
+      fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          avatar_id: avatarIdTTS,
+          text: avatar.saudacao.replace(/[😊🏥🚗🏨🏛🛍☀️🎓🩺😁⚽🔴⚪🔵🖤🤍🚀💼]/g,''),
+          emotion: 'friendly'
+        })
+      }).then(r=>r.json()).then(d=>{
+        if (d.audio_base64) {
+          const a = new Audio('data:audio/mp3;base64,'+d.audio_base64);
+          a.play().catch(()=>{});
+        }
+      }).catch(()=>{});
+    }
+  }, 300);
+}
+
+async function handleInteraction() {
+  if (ctaModeActive && ctaStep === 1) {
+    const val = chatInput.value.trim();
+    if (val) {
+      saudacaoMsg.textContent = `Obrigada! 🙏 Nosso especialista entrará em contato em até 2 horas úteis.`;
+      limparQuickReplies();
+      ctaModeActive = false;
+      chatInput.value = '';
+    }
+    return;
+  }
+
+  const userMsg = chatInput.value.trim();
+  if (!userMsg) return;
+  chatInput.value = '';
+
+  saudacaoMsg.textContent = '🎤 Gerando resposta...';
+
+  const av = avatars[selectedAvatarIndex];
+  const avatarId = getAvatarIdFromName(av.name);
+
+  const respostas = {
+    sofia: `Obrigada pela mensagem! Posso te mostrar como nossos especialistas digitais funcionam no seu site. Quer saber mais?`,
+    rafael: `Entendido! Sobre "${userMsg}" no contexto tributário, posso ajudar com ICMS-ST, substituição tributária e regularizações fiscais.`,
+    clara: `Recebi! Na área hospitalar posso orientar sobre consultas, especialidades e convênios. Como posso ajudar mais?`,
+    lucas: `Boa pergunta! No setor automotivo temos financiamentos, test drives e comparativos de modelos disponíveis.`,
+    default: `Recebi sua mensagem sobre "${userMsg}". Como especialista nesta área, estou aqui para ajudar!`
+  };
+  const resposta = respostas[avatarId] || respostas.default;
+
+  setTimeout(() => {
+    saudacaoMsg.textContent = resposta;
+  }, 300);
+
+  try {
+    await window.falarAvatar(avatarId, resposta, 'friendly');
+  } catch (error) {
+    console.warn('Falha no TTS do avatar:', error);
+  }
+
+  if (selectedAvatarIndex !== 0) {
+    interactionCount++;
+    if (interactionCount >= 5) {
+      setTimeout(() => {
+        saudacaoMsg.textContent = "Esta foi uma demonstração rápida. A Sofia pode explicar como isso funcionaria no seu site! 😊";
+        perguntasLista.innerHTML = '';
+        const btnVoltar = document.createElement('div');
+        btnVoltar.className = 'pergunta-item';
+        btnVoltar.innerHTML = '↩ Voltar para Sofia';
+        btnVoltar.onclick = () => { ctaModeActive = false; updateSelectedAvatar(0); };
+        perguntasLista.appendChild(btnVoltar);
+        perguntasBox.classList.add('visivel');
+        if (autoReturnTimer) clearTimeout(autoReturnTimer);
+        autoReturnTimer = setTimeout(() => {
+          ctaModeActive = false; updateSelectedAvatar(0);
+        }, 15000);
+      }, 2000);
+    } else resetAutoReturnTimer();
+  }
+}
+
+// RENDERIZAR THUMBNAILS
+avatars.forEach((avatar, index) => {
+  const btn = document.createElement('button');
+  btn.className = `thumbnail-btn ${index === 0 ? 'selected' : ''}`;
+  btn.onclick = () => { ctaModeActive = false; updateSelectedAvatar(index); };
+
+  const thumbDiv = document.createElement('div');
+  thumbDiv.className = 'thumbnail-avatar';
+
+  if (avatar.principal) {
+    // Tenta imagem real primeiro
+    const tImg = document.createElement('img');
+    tImg.src = GH_BASE + 'estaticas/' + avatar.principal;
+    tImg.alt = avatar.name;
+    tImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;';
+    tImg.onerror = () => {
+      // Fallback: cor + inicial
+      thumbDiv.innerHTML = '';
+      thumbDiv.textContent = avatar.initials;
+      thumbDiv.style.background = avatar.color;
+    };
+    thumbDiv.appendChild(tImg);
+    thumbDiv.style.background = 'none';
+  } else {
+    thumbDiv.textContent = avatar.initials;
+    thumbDiv.style.background = avatar.color;
+  }
+
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'thumbnail-name';
+  nameSpan.style.color = index === 0 ? '#1a1a1a' : '#6b7280';
+  nameSpan.textContent = avatar.name;
+  btn.appendChild(thumbDiv);
+  btn.appendChild(nameSpan);
+  thumbnailGrid.appendChild(btn);
+});
+
+// RENDERIZAR SOLUÇÕES
+const solucoesGrid = document.getElementById('solucoesGrid');
+solucoesCards.forEach(card => {
+  const av = avatars[card.avatarIndex];
+  const cardDiv = document.createElement('div');
+  cardDiv.className = 'solucao-card';
+
+  // Círculo com foto real
+  const circle = document.createElement('div');
+  circle.className = 'avatar-circle';
+  circle.title = `Clique para conversar com ${av.name}`;
+  circle.style.background = av.color; // fallback bg
+
+  if (av.principal) {
+    const cImg = document.createElement('img');
+    cImg.src = GH_BASE + 'estaticas/' + av.principal;
+    cImg.alt = av.name;
+    cImg.onerror = () => {
+      circle.removeChild(cImg);
+      circle.textContent = av.initials;
+    };
+    circle.appendChild(cImg);
+  } else {
+    circle.textContent = av.initials;
+  }
+
+  circle.onclick = (e) => {
+    e.stopPropagation();
+    ctaModeActive = false;
+    updateSelectedAvatar(card.avatarIndex);
+    const fl = document.getElementById('avatarFlutuante');
+    if (fl.classList.contains('minimized')) { fl.classList.remove('minimized'); document.getElementById('minimizeBtn').textContent = '−'; }
+  };
+
+  const tag = document.createElement('span'); tag.className = 'solucao-tag'; tag.textContent = card.tag;
+  const h3 = document.createElement('h3'); h3.textContent = card.titulo;
+  const p = document.createElement('p'); p.textContent = card.texto;
+  cardDiv.appendChild(circle); cardDiv.appendChild(tag); cardDiv.appendChild(h3); cardDiv.appendChild(p);
+  solucoesGrid.appendChild(cardDiv);
+});
+
+// WIDGET CONTROLS
+const avatarFlutuante = document.getElementById('avatarFlutuante');
+const minimizeBtn = document.getElementById('minimizeBtn');
+const avatarHeaderEl = document.getElementById('avatarHeader');
+minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); avatarFlutuante.classList.toggle('minimized'); minimizeBtn.textContent = avatarFlutuante.classList.contains('minimized') ? '+' : '−'; });
+avatarHeaderEl.addEventListener('click', (e) => { if (e.target === minimizeBtn || minimizeBtn.contains(e.target)) return; avatarFlutuante.classList.toggle('minimized'); minimizeBtn.textContent = avatarFlutuante.classList.contains('minimized') ? '+' : '−'; });
+sendBtn.addEventListener('click', () => { if (chatInput.value.trim()) { handleInteraction(); } });
+chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (chatInput.value.trim()) handleInteraction(); } });
+document.getElementById('openSofiaWidget')?.addEventListener('click', (e) => { e.preventDefault(); if (avatarFlutuante.classList.contains('minimized')) { avatarFlutuante.classList.remove('minimized'); minimizeBtn.textContent = '−'; } });
+
+// MICROFONE
+document.getElementById('micBtn')?.addEventListener('click', function() {
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR(); rec.lang = 'pt-BR'; rec.start();
+    this.style.background = '#dc2626'; this.textContent = '🔴';
+    rec.onresult = (e) => { chatInput.value = e.results[0][0].transcript; this.style.background = '#4f46e5'; this.textContent = '🎤'; };
+    rec.onerror = () => { this.style.background = '#4f46e5'; this.textContent = '🎤'; };
+    rec.onend = () => { this.style.background = '#4f46e5'; this.textContent = '🎤'; };
+  }
+});
+
+// PALAVRAS DINÂMICAS
+const words = document.querySelectorAll('.dynamic-word');
+let wordIndex = 0;
+setInterval(() => {
+  words[wordIndex].classList.remove('active');
+  wordIndex = (wordIndex + 1) % words.length;
+  words[wordIndex].classList.add('active');
+}, 7000);
+
+// COUNTER ANIMATION
+const counters = [
+  {id:'counter1',target:3,suffix:'x'},{id:'counter2',target:24,suffix:'h'},{id:'counter3',target:70,suffix:'%'},
+  {id:'counter4',target:85,suffix:'%'},{id:'counter5',target:5,suffix:'x'},{id:'counter6',target:13,suffix:''}
+];
+const activeTimers = {};
+function animateCounter(el,target,suffix) {
+  let current=0; const inc=target/40;
+  return setInterval(()=>{ current+=inc; if(current>=target){el.textContent=target+suffix;clearInterval(activeTimers[el.id]);}else el.textContent=Math.floor(current)+suffix; },50);
+}
+const counterObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{ if(entry.isIntersecting){ const idx=parseInt(entry.target.getAttribute('data-index')); const c=counters[idx]; const el=document.getElementById(c.id); if(activeTimers[c.id])clearInterval(activeTimers[c.id]); el.textContent='0'+c.suffix; activeTimers[c.id]=animateCounter(el,c.target,c.suffix); } });
+},{threshold:0.3});
+document.querySelectorAll('.counter-card').forEach((card,idx)=>{ card.setAttribute('data-index',idx); counterObserver.observe(card); });
+
+// FAQ
+document.querySelectorAll('.faq-question-full').forEach(q=>{
+  q.addEventListener('click',()=>{ q.classList.toggle('active'); q.nextElementSibling.classList.toggle('open'); });
+});
+
+// WhatsApp onboarding link builder
+function montarLinkWhatsApp(e) {
+  e.preventDefault();
+  const site = document.getElementById('inputSite')?.value?.trim() || '';
+  const redes = document.getElementById('inputRedes')?.value?.trim() || '';
+  const segmento = document.getElementById('inputSegmento')?.value?.trim() || '';
+  if (!site && !segmento) {
+    alert('Por favor, informe pelo menos o site ou o segmento da sua empresa para a Sofia personalizar a demonstração.');
+    return;
+  }
+  let msg = 'Olá Sofia! Quero testar o Humano Digital gratuitamente por 7 dias.\n\n';
+  if (site) msg += '🌐 Meu site: ' + site + '\n';
+  if (redes) msg += '📱 Redes sociais: ' + redes + '\n';
+  if (segmento) msg += '🏢 Sobre minha empresa: ' + segmento + '\n';
+  msg += '\nAguardo sua orientação para começarmos!';
+  const url = 'https://wa.me/5511XXXXXXXXX?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+updateSelectedAvatar(0);
+</script>
+</body>
+</html>
