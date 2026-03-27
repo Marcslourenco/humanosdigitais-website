@@ -918,6 +918,7 @@ let ctaStep = 0;
 // ========== VOZ / TTS ==========
 window.__hdPendingAudioBase64 = null;
 window.__hdPendingAudioMime = 'audio/mp3';
+window.__hdCurrentAudio = null;
 
 function sanitizeSpeechText(text) {
   return String(text || '')
@@ -934,17 +935,46 @@ function getAvatarIdFromName(name) {
     .replace(/[^a-z0-9_-]/g, '');
 }
 
+function getBackendSpeakUrl() {
+  const baseUrl = String(window.HD_BACKEND_URL || '').trim().replace(/\/+$/, '');
+  if (!baseUrl) throw new Error('HD_BACKEND_URL não configurado');
+  return `${baseUrl}/api/avatar/speak`;
+}
+
+function stopCurrentAudio() {
+  if (!window.__hdCurrentAudio) return;
+  try {
+    window.__hdCurrentAudio.pause();
+    window.__hdCurrentAudio.currentTime = 0;
+  } catch (error) {
+    console.warn('Falha ao interromper áudio atual.', error);
+  } finally {
+    window.__hdCurrentAudio = null;
+  }
+}
+
 async function playBase64Audio(audioBase64, mimeType = 'audio/mp3') {
   if (!audioBase64 || audioBase64.length < 100) {
     throw new Error('audio_base64 ausente ou muito curto');
   }
 
+  stopCurrentAudio();
+
   const audio = new Audio(`data:${mimeType};base64,${audioBase64}`);
   audio.preload = 'auto';
+  audio.playsInline = true;
+  window.__hdCurrentAudio = audio;
+
+  audio.addEventListener('ended', () => {
+    if (window.__hdCurrentAudio === audio) {
+      window.__hdCurrentAudio = null;
+    }
+  }, { once: true });
 
   try {
     await audio.play();
     window.__hdPendingAudioBase64 = null;
+    window.__hdPendingAudioMime = mimeType;
     return true;
   } catch (error) {
     window.__hdPendingAudioBase64 = audioBase64;
@@ -968,20 +998,14 @@ async function retryPendingAudio() {
 document.addEventListener('click', retryPendingAudio, { passive: true });
 document.addEventListener('touchstart', retryPendingAudio, { passive: true });
 
-async function falarAvatar(avatarId, texto, emotion = 'friendly') {
+async function requestAvatarSpeech(avatarId, texto, emotion = 'friendly') {
   const cleanAvatarId = getAvatarIdFromName(avatarId);
   const cleanText = sanitizeSpeechText(texto);
 
   if (!cleanAvatarId) throw new Error('avatarId inválido');
   if (!cleanText) throw new Error('Texto vazio para TTS');
 
-  // AllOrigins /get endpoint requer query param
-  const isAllOrigins = window.HD_BACKEND_URL.includes('allorigins');
-  const targetUrl = isAllOrigins 
-    ? window.HD_BACKEND_URL.replace('?url=', '?url=') + '/api/avatar/speak'
-    : window.HD_BACKEND_URL + '/api/avatar/speak';
-  
-  const response = await fetch(targetUrl, {
+  const response = await fetch(getBackendSpeakUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -993,13 +1017,7 @@ async function falarAvatar(avatarId, texto, emotion = 'friendly') {
 
   let data = null;
   try {
-    const json = await response.json();
-    // Se for resposta do AllOrigins, extrair do .contents
-    if (json.contents) {
-      data = typeof json.contents === 'string' ? JSON.parse(json.contents) : json.contents;
-    } else {
-      data = json;
-    }
+    data = await response.json();
   } catch (error) {
     throw new Error('Resposta inválida do backend TTS');
   }
@@ -1012,6 +1030,11 @@ async function falarAvatar(avatarId, texto, emotion = 'friendly') {
     throw new Error('Backend não retornou audio_base64');
   }
 
+  return data;
+}
+
+async function falarAvatar(avatarId, texto, emotion = 'friendly') {
+  const data = await requestAvatarSpeech(avatarId, texto, emotion);
   await playBase64Audio(data.audio_base64, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3');
   return data;
 }
@@ -1045,6 +1068,18 @@ const perguntasBox = document.getElementById('perguntasBox');
 const perguntasLista = document.getElementById('perguntasLista');
 
 function limparQuickReplies() { quickRepliesArea.innerHTML = ''; }
+function renderAssistantMessage(message) { saudacaoMsg.textContent = message; }
+function setAssistantLoading(message = '🎤 Gerando resposta...') { saudacaoMsg.textContent = message; }
+function getAvatarResponse(avatarId, userMsg) {
+  const respostas = {
+    sofia: `Obrigada pela mensagem! Posso te mostrar como nossos especialistas digitais funcionam no seu site. Quer saber mais?`,
+    rafael: `Entendido! Sobre "${userMsg}" no contexto tributário, posso ajudar com ICMS-ST, substituição tributária e regularizações fiscais.`,
+    clara: `Recebi! Na área hospitalar posso orientar sobre consultas, especialidades e convênios. Como posso ajudar mais?`,
+    lucas: `Boa pergunta! No setor automotivo temos financiamentos, test drives e comparativos de modelos disponíveis.`,
+    default: `Recebi sua mensagem sobre "${userMsg}". Como especialista nesta área, estou aqui para ajudar!`
+  };
+  return respostas[avatarId] || respostas.default;
+}
 
 function mostrarPerguntasMainArea(avatar) {
   if (!perguntasBox || !perguntasLista) return;
@@ -1055,6 +1090,7 @@ function mostrarPerguntasMainArea(avatar) {
       item.className = 'pergunta-item';
       item.textContent = p;
       item.onclick = () => {
+        chatInput.value = p;
         handleInteraction();
         // Remove esta pergunta visualmente
         item.style.opacity = '0.4';
@@ -1166,27 +1202,13 @@ function updateSelectedAvatar(index) {
   interactionCount = 0;
   resetAutoReturnTimer();
 
-  // ── TOCAR SAUDAÇÃO COM VOZ ──
-  const avatarIdTTS = avatar.name.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  setTimeout(() => {
-    if (typeof window.saudarAvatar === 'function') {
-      window.saudarAvatar(avatarIdTTS);
-    } else if (window.HD_BACKEND_URL) {
-      fetch(window.HD_BACKEND_URL + '/api/avatar/speak', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          avatar_id: avatarIdTTS,
-          text: avatar.saudacao.replace(/[😊🏥🚗🏨🏛🛍☀️🎓🩺😁⚽🔴⚪🔵🖤🤍🚀💼]/g,''),
-          emotion: 'friendly'
-        })
-      }).then(r=>r.json()).then(d=>{
-        if (d.audio_base64) {
-          const a = new Audio('data:audio/mp3;base64,'+d.audio_base64);
-          a.play().catch(()=>{});
-        }
-      }).catch(()=>{});
+  // ── TOCAR SAUDAÇÃO COM VOZ PELA MESMA PIPELINE OFICIAL ──
+  const avatarIdTTS = getAvatarIdFromName(avatar.name);
+  setTimeout(async () => {
+    try {
+      await saudarAvatar(avatarIdTTS);
+    } catch (error) {
+      console.warn('Falha ao tocar saudação do avatar.', error);
     }
   }, 300);
 }
@@ -1207,26 +1229,18 @@ async function handleInteraction() {
   if (!userMsg) return;
   chatInput.value = '';
 
-  saudacaoMsg.textContent = '🎤 Gerando resposta...';
+  setAssistantLoading();
 
   const av = avatars[selectedAvatarIndex];
   const avatarId = getAvatarIdFromName(av.name);
-
-  const respostas = {
-    sofia: `Obrigada pela mensagem! Posso te mostrar como nossos especialistas digitais funcionam no seu site. Quer saber mais?`,
-    rafael: `Entendido! Sobre "${userMsg}" no contexto tributário, posso ajudar com ICMS-ST, substituição tributária e regularizações fiscais.`,
-    clara: `Recebi! Na área hospitalar posso orientar sobre consultas, especialidades e convênios. Como posso ajudar mais?`,
-    lucas: `Boa pergunta! No setor automotivo temos financiamentos, test drives e comparativos de modelos disponíveis.`,
-    default: `Recebi sua mensagem sobre "${userMsg}". Como especialista nesta área, estou aqui para ajudar!`
-  };
-  const resposta = respostas[avatarId] || respostas.default;
+  const resposta = getAvatarResponse(avatarId, userMsg);
 
   setTimeout(() => {
-    saudacaoMsg.textContent = resposta;
+    renderAssistantMessage(resposta);
   }, 300);
 
   try {
-    await window.falarAvatar(avatarId, resposta, 'friendly');
+    await falarAvatar(avatarId, resposta, 'friendly');
   } catch (error) {
     console.warn('Falha no TTS do avatar:', error);
   }
@@ -1337,7 +1351,7 @@ const avatarHeaderEl = document.getElementById('avatarHeader');
 minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); avatarFlutuante.classList.toggle('minimized'); minimizeBtn.textContent = avatarFlutuante.classList.contains('minimized') ? '+' : '−'; });
 avatarHeaderEl.addEventListener('click', (e) => { if (e.target === minimizeBtn || minimizeBtn.contains(e.target)) return; avatarFlutuante.classList.toggle('minimized'); minimizeBtn.textContent = avatarFlutuante.classList.contains('minimized') ? '+' : '−'; });
 sendBtn.addEventListener('click', () => { if (chatInput.value.trim()) { handleInteraction(); } });
-chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (chatInput.value.trim()) handleInteraction(); } });
+chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (chatInput.value.trim()) handleInteraction(); } });
 document.getElementById('openSofiaWidget')?.addEventListener('click', (e) => { e.preventDefault(); if (avatarFlutuante.classList.contains('minimized')) { avatarFlutuante.classList.remove('minimized'); minimizeBtn.textContent = '−'; } });
 
 // MICROFONE
