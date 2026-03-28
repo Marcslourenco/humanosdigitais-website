@@ -100,6 +100,80 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 .input-actions-small button { width: 28px; height: 28px; border-radius: 50%; border: none; background: #4f46e5; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: background 0.2s; }
 .input-actions-small button:hover { background: #6366f1; }
 
+/* AVATAR VIVO — respiração, piscar e sync-lip */
+#floatAvatarPlaceholder {
+  position: relative;
+  overflow: hidden;
+  transform-origin: center bottom;
+  --mouth-open: 0.08;
+  --mouth-width: 0.94;
+  --mouth-opacity: 0.10;
+  --avatar-scale: 1;
+  --avatar-shift-y: 0px;
+  --mouth-tilt: 0deg;
+}
+#floatAvatarPlaceholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform-origin: center 72%;
+  transform: translateY(var(--avatar-shift-y)) scale(var(--avatar-scale));
+  transition: transform 70ms linear, filter 120ms ease;
+  will-change: transform, filter;
+}
+#floatAvatarPlaceholder::before {
+  content: '';
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 23%;
+  height: 18%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(10, 42, 68, 0.02), rgba(10, 42, 68, 0.22));
+  opacity: 0;
+  transform: scaleY(0.08);
+  transform-origin: center center;
+  transition: opacity 90ms ease, transform 90ms ease;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+#floatAvatarPlaceholder.is-blinking::before {
+  opacity: 0.72;
+  transform: scaleY(1);
+}
+#floatAvatarPlaceholder::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  width: 28%;
+  height: 12%;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center, rgba(22, 18, 34, 0.88) 0%, rgba(22, 18, 34, 0.22) 62%, rgba(22, 18, 34, 0) 74%);
+  transform: translateX(-50%) scaleX(var(--mouth-width)) scaleY(var(--mouth-open)) rotate(var(--mouth-tilt));
+  transform-origin: center center;
+  opacity: var(--mouth-opacity);
+  transition: transform 70ms linear, opacity 110ms ease;
+  filter: blur(0.3px);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+#floatAvatarPlaceholder.idle-motion {
+  animation: hdBreathing 4.2s ease-in-out infinite;
+}
+#floatAvatarPlaceholder.is-speaking {
+  animation-play-state: paused;
+}
+#floatAvatarPlaceholder.is-speaking img {
+  filter: saturate(1.02) contrast(1.01);
+}
+@keyframes hdBreathing {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.012); }
+}
+
+
 /* ============================================
    SEÇÃO 1 — STICKY para efeito de sobreposição
    ============================================ */
@@ -872,6 +946,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 // ========== BACKEND TTS ==========
 // Backend TTS com HTTPS nativo no Render
 window.HD_BACKEND_URL = 'https://atti-media-server.onrender.com';
+window._hdSessionId = localStorage.getItem('hd_session_id') || (() => { const id = 'sess_' + Math.random().toString(36).slice(2, 11); localStorage.setItem('hd_session_id', id); return id; })();
 // Vercel Force Rebuild: 2026-03-24 18:00
 
 // ========== DADOS DOS AVATARES ==========
@@ -914,10 +989,73 @@ let interactionCount = 0;
 let autoReturnTimer = null;
 let ctaModeActive = false;
 let ctaStep = 0;
+let currentContextUrl = window.location.pathname || '/';
+let hdSpeechTimers = [];
+let hdBlinkTimer = null;
+let hdIdleTimer = null;
+let hdIsSpeaking = false;
+
+const SECTION_CONTEXT_MAP = {
+  plataforma: '/avatares',
+  solucoes: '/avatares',
+  recursos: '/integracao',
+  precos: '/precos',
+  faq: '/cases',
+  demonstracao: '/contato'
+};
+
+const VISEME_STYLE_MAP = {
+  A: { open: 0.96, width: 1.12, opacity: 0.26, tilt: 0 },
+  E: { open: 0.76, width: 1.06, opacity: 0.22, tilt: 0 },
+  I: { open: 0.52, width: 0.82, opacity: 0.18, tilt: 0 },
+  O: { open: 0.84, width: 0.94, opacity: 0.24, tilt: 0 },
+  U: { open: 0.64, width: 0.74, opacity: 0.21, tilt: 0 },
+  M: { open: 0.12, width: 0.98, opacity: 0.10, tilt: 0 },
+  F: { open: 0.26, width: 1.08, opacity: 0.13, tilt: 0 },
+  S: { open: 0.22, width: 1.03, opacity: 0.12, tilt: 0 },
+  L: { open: 0.34, width: 1.00, opacity: 0.14, tilt: 0 },
+  T: { open: 0.28, width: 0.98, opacity: 0.13, tilt: 0 },
+  K: { open: 0.30, width: 0.96, opacity: 0.13, tilt: 0 },
+  CLOSED: { open: 0.08, width: 0.94, opacity: 0.10, tilt: 0 }
+};
+
+const PHONEME_TO_VISEME = {
+  a: 'A', á: 'A', â: 'A', ã: 'A', à: 'A',
+  e: 'E', é: 'E', ê: 'E',
+  i: 'I', í: 'I',
+  o: 'O', ó: 'O', ô: 'O', õ: 'O',
+  u: 'U', ú: 'U', ü: 'U',
+  m: 'M', b: 'M', p: 'M',
+  f: 'F', v: 'F',
+  s: 'S', z: 'S', c: 'S', ç: 'S', x: 'S', j: 'S',
+  l: 'L', n: 'L', r: 'L',
+  t: 'T', d: 'T',
+  k: 'K', g: 'K', q: 'K',
+  ' ': 'CLOSED', '.': 'CLOSED', ',': 'CLOSED', ';': 'CLOSED', ':': 'CLOSED', '!': 'CLOSED', '?': 'CLOSED'
+};
+
+// ========== ELEMENTOS ==========
+const thumbnailGrid = document.getElementById('thumbnailGrid');
+const avatarLarge = document.getElementById('avatarLarge');
+const avatarName = document.getElementById('avatarName');
+const avatarRole = document.getElementById('avatarRole');
+const floatAvatarIcon = document.getElementById('floatAvatarIcon');
+const floatAvatarName = document.getElementById('floatAvatarName');
+const floatAvatarRole = document.getElementById('floatAvatarRole');
+const floatPlaceholderLetter = document.getElementById('floatPlaceholderLetter');
+const floatAvatarPlaceholder = document.getElementById('floatAvatarPlaceholder');
+const demoBadge = document.getElementById('demoBadge');
+const sendBtn = document.getElementById('sendMessageBtn');
+const chatInput = document.getElementById('chatInput');
+const saudacaoMsg = document.getElementById('saudacaoMsg');
+const quickRepliesArea = document.getElementById('quickRepliesArea');
+const perguntasBox = document.getElementById('perguntasBox');
+const perguntasLista = document.getElementById('perguntasLista');
 
 // ========== VOZ / TTS ==========
 window.__hdPendingAudioBase64 = null;
 window.__hdPendingAudioMime = 'audio/mp3';
+window.__hdPendingSpeechMeta = null;
 window.__hdCurrentAudio = null;
 
 function sanitizeSpeechText(text) {
@@ -933,6 +1071,149 @@ function getAvatarIdFromName(name) {
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9_-]/g, '');
+}
+
+function estimateDurationFromText(text) {
+  const base = Math.max(1300, Math.round((String(text || '').length || 12) * 72));
+  return Math.min(base, 12000);
+}
+
+function normalizeVisemeName(value) {
+  const raw = String(value || 'closed').trim().toUpperCase();
+  if (!raw || raw === 'SIL' || raw === 'SILENCE') return 'CLOSED';
+  if (raw === 'CLOSED') return 'CLOSED';
+  return VISEME_STYLE_MAP[raw] ? raw : 'CLOSED';
+}
+
+function applyAvatarViseme(visemeName, options = {}) {
+  if (!floatAvatarPlaceholder) return;
+  const viseme = normalizeVisemeName(visemeName);
+  const style = VISEME_STYLE_MAP[viseme] || VISEME_STYLE_MAP.CLOSED;
+  const idleFactor = options.idle ? 0.45 : 1;
+  const open = (style.open * idleFactor).toFixed(3);
+  const width = (1 + ((style.width || 1) - 1) * idleFactor).toFixed(3);
+  const opacity = (Math.max(0.08, (style.opacity || 0.10) * idleFactor)).toFixed(3);
+  const shiftY = `${(-2.4 * style.open * idleFactor).toFixed(2)}px`;
+  const scale = (1 + style.open * 0.012 * idleFactor).toFixed(3);
+  floatAvatarPlaceholder.dataset.viseme = viseme.toLowerCase();
+  floatAvatarPlaceholder.style.setProperty('--mouth-open', open);
+  floatAvatarPlaceholder.style.setProperty('--mouth-width', width);
+  floatAvatarPlaceholder.style.setProperty('--mouth-opacity', opacity);
+  floatAvatarPlaceholder.style.setProperty('--avatar-shift-y', shiftY);
+  floatAvatarPlaceholder.style.setProperty('--avatar-scale', scale);
+  floatAvatarPlaceholder.style.setProperty('--mouth-tilt', `${style.tilt || 0}deg`);
+}
+
+function clearSpeechAnimationTimers() {
+  hdSpeechTimers.forEach((timerId) => clearTimeout(timerId));
+  hdSpeechTimers = [];
+}
+
+function clearIdleTimers() {
+  if (hdBlinkTimer) clearTimeout(hdBlinkTimer);
+  if (hdIdleTimer) clearTimeout(hdIdleTimer);
+  hdBlinkTimer = null;
+  hdIdleTimer = null;
+}
+
+function stopAvatarSpeechAnimation(resetToIdle = true) {
+  clearSpeechAnimationTimers();
+  hdIsSpeaking = false;
+  floatAvatarPlaceholder?.classList.remove('is-speaking');
+  if (resetToIdle) startIdleAvatarMotion();
+}
+
+function startAvatarSpeechAnimation(visemeFrames = []) {
+  clearSpeechAnimationTimers();
+  clearIdleTimers();
+  hdIsSpeaking = true;
+  floatAvatarPlaceholder?.classList.add('is-speaking');
+  const frames = Array.isArray(visemeFrames) && visemeFrames.length ? visemeFrames : [{ time_ms: 0, viseme: 'CLOSED' }];
+  applyAvatarViseme(frames[0]?.viseme || 'CLOSED');
+  frames.forEach((frame, index) => {
+    if (index === 0) return;
+    const timerId = setTimeout(() => {
+      if (!hdIsSpeaking) return;
+      applyAvatarViseme(frame.viseme || 'CLOSED');
+    }, Number(frame.time_ms) || 0);
+    hdSpeechTimers.push(timerId);
+  });
+  const lastFrame = frames[frames.length - 1] || { time_ms: 0 };
+  const endTimer = setTimeout(() => stopAvatarSpeechAnimation(true), (Number(lastFrame.time_ms) || 0) + 220);
+  hdSpeechTimers.push(endTimer);
+}
+
+function scheduleBlink() {
+  if (!floatAvatarPlaceholder) return;
+  if (hdBlinkTimer) clearTimeout(hdBlinkTimer);
+  hdBlinkTimer = setTimeout(() => {
+    if (!hdIsSpeaking) {
+      floatAvatarPlaceholder.classList.add('is-blinking');
+      setTimeout(() => floatAvatarPlaceholder?.classList.remove('is-blinking'), 130);
+    }
+    scheduleBlink();
+  }, 2400 + Math.round(Math.random() * 3000));
+}
+
+function scheduleIdleVisemePulse() {
+  if (!floatAvatarPlaceholder) return;
+  if (hdIdleTimer) clearTimeout(hdIdleTimer);
+  hdIdleTimer = setTimeout(() => {
+    if (hdIsSpeaking) return;
+    const idleFrames = ['M', 'CLOSED', Math.random() > 0.5 ? 'E' : 'M', 'CLOSED'];
+    idleFrames.forEach((viseme, index) => {
+      const timerId = setTimeout(() => {
+        if (!hdIsSpeaking) applyAvatarViseme(viseme, { idle: true });
+      }, index * 110);
+      hdSpeechTimers.push(timerId);
+    });
+    scheduleIdleVisemePulse();
+  }, 2600 + Math.round(Math.random() * 2200));
+}
+
+function startIdleAvatarMotion() {
+  if (!floatAvatarPlaceholder) return;
+  clearIdleTimers();
+  floatAvatarPlaceholder.classList.remove('is-speaking');
+  floatAvatarPlaceholder.classList.add('idle-motion');
+  applyAvatarViseme('CLOSED', { idle: true });
+  scheduleBlink();
+  scheduleIdleVisemePulse();
+}
+
+function normalizeContextPath(rawValue) {
+  const fallback = window.location.pathname || '/';
+  if (!rawValue) return fallback;
+  if (rawValue.startsWith('/')) return rawValue;
+  return `/${rawValue.replace(/^#/, '')}`;
+}
+
+function getHashContext() {
+  const sectionId = String(window.location.hash || '').replace('#', '').trim();
+  if (!sectionId) return null;
+  return SECTION_CONTEXT_MAP[sectionId] || normalizeContextPath(sectionId);
+}
+
+function setupContextTracking() {
+  const observedSections = Object.keys(SECTION_CONTEXT_MAP).map((sectionId) => document.getElementById(sectionId)).filter(Boolean);
+  const hashContext = getHashContext();
+  currentContextUrl = hashContext || (window.location.pathname && window.location.pathname !== '/' ? window.location.pathname : '/avatares');
+  if (!observedSections.length || !('IntersectionObserver' in window)) return;
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible?.target?.id) return;
+    currentContextUrl = SECTION_CONTEXT_MAP[visible.target.id] || currentContextUrl;
+  }, { threshold: [0.35, 0.55, 0.75] });
+  observedSections.forEach((section) => observer.observe(section));
+  window.addEventListener('hashchange', () => {
+    const mapped = getHashContext();
+    if (mapped) currentContextUrl = mapped;
+  });
+}
+
+function getCurrentContextUrl() {
+  if (window.location.pathname && window.location.pathname !== '/' && !window.location.hash) return window.location.pathname;
+  return getHashContext() || currentContextUrl || window.location.pathname || '/';
 }
 
 function getBackendSpeakUrl() {
@@ -953,33 +1234,47 @@ function stopCurrentAudio() {
   }
 }
 
-async function playBase64Audio(audioBase64, mimeType = 'audio/mp3') {
-  if (!audioBase64 || audioBase64.length < 100) {
-    throw new Error('audio_base64 ausente ou muito curto');
-  }
+function buildSpeechMeta(responseData, fallbackText, avatarId) {
+  const renderText = responseData?.text_response || responseData?.text_spoken || fallbackText;
+  const durationMs = Number(responseData?.duration_ms) || estimateDurationFromText(renderText);
+  const visemeFrames = normalizeVisemeFrames(responseData, renderText, durationMs);
+  return { avatarId: responseData?.avatar_id || avatarId, renderText, durationMs, visemeFrames };
+}
 
+function attachAudioLifecycle(audio, speechMeta) {
+  if (!audio || !speechMeta) return;
+  audio.addEventListener('play', () => startAvatarSpeechAnimation(speechMeta.visemeFrames));
+  audio.addEventListener('ended', () => {
+    if (window.__hdCurrentAudio === audio) window.__hdCurrentAudio = null;
+    stopAvatarSpeechAnimation(true);
+  }, { once: true });
+  audio.addEventListener('pause', () => {
+    if (audio.ended) return;
+    stopAvatarSpeechAnimation(true);
+  });
+}
+
+async function playBase64Audio(audioBase64, mimeType = 'audio/mp3', speechMeta = null) {
+  if (!audioBase64 || audioBase64.length < 100) throw new Error('audio_base64 ausente ou muito curto');
   stopCurrentAudio();
-
+  stopAvatarSpeechAnimation(false);
   const audio = new Audio(`data:${mimeType};base64,${audioBase64}`);
   audio.preload = 'auto';
   audio.playsInline = true;
   window.__hdCurrentAudio = audio;
-
-  audio.addEventListener('ended', () => {
-    if (window.__hdCurrentAudio === audio) {
-      window.__hdCurrentAudio = null;
-    }
-  }, { once: true });
-
+  attachAudioLifecycle(audio, speechMeta);
   try {
     await audio.play();
     window.__hdPendingAudioBase64 = null;
     window.__hdPendingAudioMime = mimeType;
+    window.__hdPendingSpeechMeta = null;
     return true;
   } catch (error) {
     window.__hdPendingAudioBase64 = audioBase64;
     window.__hdPendingAudioMime = mimeType;
+    window.__hdPendingSpeechMeta = speechMeta;
     console.warn('Autoplay bloqueado; áudio será tentado no próximo clique.', error);
+    startIdleAvatarMotion();
     return false;
   }
 }
@@ -988,8 +1283,9 @@ async function retryPendingAudio() {
   if (!window.__hdPendingAudioBase64) return;
   const pending = window.__hdPendingAudioBase64;
   const mime = window.__hdPendingAudioMime || 'audio/mp3';
+  const speechMeta = window.__hdPendingSpeechMeta || null;
   try {
-    await playBase64Audio(pending, mime);
+    await playBase64Audio(pending, mime, speechMeta);
   } catch (error) {
     console.warn('Falha ao tocar áudio pendente.', error);
   }
@@ -998,101 +1294,104 @@ async function retryPendingAudio() {
 document.addEventListener('click', retryPendingAudio, { passive: true });
 document.addEventListener('touchstart', retryPendingAudio, { passive: true });
 
+function generateMockVisemesFromText(text, durationMs = 3000) {
+  const normalized = String(text || '').toLowerCase();
+  const chars = Array.from(normalized);
+  if (!chars.length) return [{ time_ms: 0, viseme: 'CLOSED' }];
+  const frames = [];
+  const step = Math.max(60, Math.round(durationMs / Math.max(chars.length, 12)));
+  let time = 0;
+  chars.forEach((char) => {
+    const viseme = PHONEME_TO_VISEME[char] || 'CLOSED';
+    if (!frames.length || frames[frames.length - 1].viseme !== viseme) frames.push({ time_ms: time, viseme });
+    time += step;
+  });
+  if (!frames.length || frames[frames.length - 1].viseme !== 'CLOSED') frames.push({ time_ms: time, viseme: 'CLOSED' });
+  return frames;
+}
+
+function normalizeVisemeFrames(data, text, durationMs) {
+  if (Array.isArray(data?.visemes) && data.visemes.length) {
+    return data.visemes.map((item) => ({ time_ms: Number(item?.time_ms ?? item?.start_ms ?? 0) || 0, viseme: normalizeVisemeName(item?.viseme || item?.name || 'CLOSED') })).sort((a, b) => a.time_ms - b.time_ms);
+  }
+  if (Array.isArray(data?.viseme_meta?.timeline) && data.viseme_meta.timeline.length) {
+    return data.viseme_meta.timeline.map((item) => ({ time_ms: Number(item?.time_ms ?? item?.start_ms ?? 0) || 0, viseme: normalizeVisemeName(item?.viseme || item?.name || 'CLOSED') })).sort((a, b) => a.time_ms - b.time_ms);
+  }
+  return generateMockVisemesFromText(text, durationMs);
+}
+
 async function requestAvatarSpeech(avatarId, texto, emotion = 'friendly') {
   const cleanAvatarId = getAvatarIdFromName(avatarId);
   const cleanText = sanitizeSpeechText(texto);
-
   if (!cleanAvatarId) throw new Error('avatarId inválido');
   if (!cleanText) throw new Error('Texto vazio para TTS');
-
   const response = await fetch(getBackendSpeakUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       avatar_id: cleanAvatarId,
       text: cleanText,
-      emotion: emotion || 'friendly'
+      emotion: emotion || 'friendly',
+      session_id: window._hdSessionId || 'default',
+      context_url: getCurrentContextUrl()
     })
   });
-
   let data = null;
   try {
     data = await response.json();
   } catch (error) {
     throw new Error('Resposta inválida do backend TTS');
   }
-
-  if (!response.ok) {
-    throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
-  }
-
-  if (!data?.audio_base64) {
-    throw new Error('Backend não retornou audio_base64');
-  }
-
+  if (!response.ok) throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
+  if (!data?.audio_base64) throw new Error('Backend não retornou audio_base64');
   return data;
 }
 
-async function falarAvatar(avatarId, texto, emotion = 'friendly') {
-  const data = await requestAvatarSpeech(avatarId, texto, emotion);
-  await playBase64Audio(data.audio_base64, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3');
+function normalizeSpeechOptions(optionsOrEmotion) {
+  if (typeof optionsOrEmotion === 'string') return { emotion: optionsOrEmotion };
+  return optionsOrEmotion || {};
+}
+
+async function falarAvatar(avatarId, texto, optionsOrEmotion = 'friendly') {
+  const options = normalizeSpeechOptions(optionsOrEmotion);
+  const cleanAvatarId = getAvatarIdFromName(avatarId);
+  const cleanText = sanitizeSpeechText(texto);
+  const data = await requestAvatarSpeech(cleanAvatarId, cleanText, options.emotion || 'friendly');
+  const speechMeta = buildSpeechMeta(data, cleanText, cleanAvatarId);
+  if (options.updateBubble !== false) renderAssistantMessage(speechMeta.renderText);
+  data.render_text = speechMeta.renderText;
+  data.viseme_frames = speechMeta.visemeFrames;
+  data.context_url_sent = getCurrentContextUrl();
+  await playBase64Audio(data.audio_base64, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3', speechMeta);
   return data;
 }
 
 async function saudarAvatar(avatarId) {
   const cleanAvatarId = getAvatarIdFromName(avatarId);
-  const avatar = avatars.find(item => getAvatarIdFromName(item.name) === cleanAvatarId);
+  const avatar = avatars.find((item) => getAvatarIdFromName(item.name) === cleanAvatarId);
   if (!avatar) throw new Error(`Avatar não encontrado: ${avatarId}`);
-  return falarAvatar(cleanAvatarId, avatar.saudacao, 'friendly');
+  return falarAvatar(cleanAvatarId, avatar.saudacao, { emotion: 'friendly', updateBubble: true });
 }
 
 window.falarAvatar = falarAvatar;
 window.saudarAvatar = saudarAvatar;
-
-// ========== ELEMENTOS ==========
-const thumbnailGrid = document.getElementById('thumbnailGrid');
-const avatarLarge = document.getElementById('avatarLarge');
-const avatarName = document.getElementById('avatarName');
-const avatarRole = document.getElementById('avatarRole');
-const floatAvatarIcon = document.getElementById('floatAvatarIcon');
-const floatAvatarName = document.getElementById('floatAvatarName');
-const floatAvatarRole = document.getElementById('floatAvatarRole');
-const floatPlaceholderLetter = document.getElementById('floatPlaceholderLetter');
-const floatAvatarPlaceholder = document.getElementById('floatAvatarPlaceholder');
-const demoBadge = document.getElementById('demoBadge');
-const sendBtn = document.getElementById('sendMessageBtn');
-const chatInput = document.getElementById('chatInput');
-const saudacaoMsg = document.getElementById('saudacaoMsg');
-const quickRepliesArea = document.getElementById('quickRepliesArea');
-const perguntasBox = document.getElementById('perguntasBox');
-const perguntasLista = document.getElementById('perguntasLista');
+window.getCurrentContextUrl = getCurrentContextUrl;
 
 function limparQuickReplies() { quickRepliesArea.innerHTML = ''; }
 function renderAssistantMessage(message) { saudacaoMsg.textContent = message; }
-function setAssistantLoading(message = '🎤 Gerando resposta...') { saudacaoMsg.textContent = message; }
-function getAvatarResponse(avatarId, userMsg) {
-  const respostas = {
-    sofia: `Obrigada pela mensagem! Posso te mostrar como nossos especialistas digitais funcionam no seu site. Quer saber mais?`,
-    rafael: `Entendido! Sobre "${userMsg}" no contexto tributário, posso ajudar com ICMS-ST, substituição tributária e regularizações fiscais.`,
-    clara: `Recebi! Na área hospitalar posso orientar sobre consultas, especialidades e convênios. Como posso ajudar mais?`,
-    lucas: `Boa pergunta! No setor automotivo temos financiamentos, test drives e comparativos de modelos disponíveis.`,
-    default: `Recebi sua mensagem sobre "${userMsg}". Como especialista nesta área, estou aqui para ajudar!`
-  };
-  return respostas[avatarId] || respostas.default;
-}
+function setAssistantLoading(message = '🎤 Gerando resposta inteligente...') { saudacaoMsg.textContent = message; }
 
 function mostrarPerguntasMainArea(avatar) {
   if (!perguntasBox || !perguntasLista) return;
   if (avatar.perguntas && avatar.perguntas.length > 0 && avatar.name !== 'Sofia') {
     perguntasLista.innerHTML = '';
-    avatar.perguntas.forEach(p => {
+    avatar.perguntas.forEach((p) => {
       const item = document.createElement('div');
       item.className = 'pergunta-item';
       item.textContent = p;
       item.onclick = () => {
         chatInput.value = p;
         handleInteraction();
-        // Remove esta pergunta visualmente
         item.style.opacity = '0.4';
         item.style.pointerEvents = 'none';
       };
@@ -1111,13 +1410,13 @@ function abrirSofiaComCTA() {
   if (selectedAvatarIndex !== 0) { ctaModeActive = false; updateSelectedAvatar(0); }
   ctaModeActive = true;
   ctaStep = 0;
-  saudacaoMsg.textContent = "Olá! 😊 Estou aqui para conectar você com nosso especialista. Me diz: qual é o segmento da sua empresa?";
+  saudacaoMsg.textContent = 'Olá! 😊 Estou aqui para conectar você com nosso especialista. Me diz: qual é o segmento da sua empresa?';
   limparQuickReplies();
-  ["Comércio/Varejo","Saúde/Hospitais","Serviços/Turismo","Indústria/B2B","E-commerce"].forEach(s => {
+  ['Comércio/Varejo', 'Saúde/Hospitais', 'Serviços/Turismo', 'Indústria/B2B', 'E-commerce'].forEach((segmento) => {
     const btn = document.createElement('button');
     btn.className = 'quick-reply-btn';
-    btn.textContent = s;
-    btn.onclick = () => { saudacaoMsg.textContent = `Perfeito! Para soluções em ${s}, nosso especialista entrará em contato em breve. Me passa seu WhatsApp?`; limparQuickReplies(); ctaStep = 1; };
+    btn.textContent = segmento;
+    btn.onclick = () => { saudacaoMsg.textContent = `Perfeito! Para soluções em ${segmento}, nosso especialista entrará em contato em breve. Me passa seu WhatsApp?`; limparQuickReplies(); ctaStep = 1; };
     quickRepliesArea.appendChild(btn);
   });
 }
@@ -1133,19 +1432,16 @@ function updateSelectedAvatar(index) {
   selectedAvatarIndex = index;
   const avatar = avatars[index];
   const GH = 'https://raw.githubusercontent.com/Marcslourenco/humanosdigitais-website/main/assets/avatares/';
+  stopCurrentAudio();
+  stopAvatarSpeechAnimation(true);
 
-  // ── AVATAR GRANDE CENTRAL (usa img_principal) ──
   avatarLarge.innerHTML = '';
   if (avatar.principal) {
     const img = document.createElement('img');
     img.src = GH + 'estaticas/' + avatar.principal;
     img.alt = avatar.name;
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:1rem;display:block;';
-    img.onerror = () => {
-      avatarLarge.innerHTML = '';
-      avatarLarge.textContent = avatar.initials;
-      avatarLarge.style.background = avatar.color;
-    };
+    img.onerror = () => { avatarLarge.innerHTML = ''; avatarLarge.textContent = avatar.initials; avatarLarge.style.background = avatar.color; };
     avatarLarge.appendChild(img);
     avatarLarge.style.background = 'none';
   } else {
@@ -1159,13 +1455,13 @@ function updateSelectedAvatar(index) {
   floatAvatarName.textContent = avatar.name;
   floatAvatarRole.textContent = avatar.shortRole;
 
-  // ── WIDGET CANTO INFERIOR DIREITO (usa img_synclip) ──
   floatAvatarPlaceholder.innerHTML = '';
+  floatAvatarPlaceholder.setAttribute('data-hd-avatar', getAvatarIdFromName(avatar.name));
   if (avatar.synclip) {
     const fImg = document.createElement('img');
+    fImg.id = 'avatarImage';
     fImg.src = GH + 'synclip/' + avatar.synclip;
     fImg.alt = avatar.name;
-    fImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
     fImg.onerror = () => {
       floatAvatarPlaceholder.innerHTML = '';
       const sp = document.createElement('span');
@@ -1183,13 +1479,7 @@ function updateSelectedAvatar(index) {
     floatAvatarPlaceholder.style.background = avatar.color;
   }
 
-  // Saudação no widget
-  if (!ctaModeActive) {
-    saudacaoMsg.textContent = avatar.saudacao;
-    limparQuickReplies();
-  }
-
-  // Perguntas no painel principal abaixo do avatar grande
+  if (!ctaModeActive) { saudacaoMsg.textContent = avatar.saudacao; limparQuickReplies(); }
   mostrarPerguntasMainArea(avatar);
 
   if (index !== 0) demoBadge.classList.add('active');
@@ -1201,14 +1491,17 @@ function updateSelectedAvatar(index) {
   });
   interactionCount = 0;
   resetAutoReturnTimer();
+  startIdleAvatarMotion();
 
-  // ── TOCAR SAUDAÇÃO COM VOZ PELA MESMA PIPELINE OFICIAL ──
   const avatarIdTTS = getAvatarIdFromName(avatar.name);
   setTimeout(async () => {
     try {
+      setAssistantLoading(`🎤 ${avatar.name} está se preparando para responder...`);
       await saudarAvatar(avatarIdTTS);
     } catch (error) {
       console.warn('Falha ao tocar saudação do avatar.', error);
+      saudacaoMsg.textContent = avatar.saudacao;
+      startIdleAvatarMotion();
     }
   }, 300);
 }
@@ -1217,7 +1510,7 @@ async function handleInteraction() {
   if (ctaModeActive && ctaStep === 1) {
     const val = chatInput.value.trim();
     if (val) {
-      saudacaoMsg.textContent = `Obrigada! 🙏 Nosso especialista entrará em contato em até 2 horas úteis.`;
+      saudacaoMsg.textContent = 'Obrigada! 🙏 Nosso especialista entrará em contato em até 2 horas úteis.';
       limparQuickReplies();
       ctaModeActive = false;
       chatInput.value = '';
@@ -1228,28 +1521,22 @@ async function handleInteraction() {
   const userMsg = chatInput.value.trim();
   if (!userMsg) return;
   chatInput.value = '';
-
-  setAssistantLoading();
-
+  setAssistantLoading('🎤 Consultando o backend inteligente...');
   const av = avatars[selectedAvatarIndex];
   const avatarId = getAvatarIdFromName(av.name);
-  const resposta = getAvatarResponse(avatarId, userMsg);
-
-  setTimeout(() => {
-    renderAssistantMessage(resposta);
-  }, 300);
-
   try {
-    await falarAvatar(avatarId, resposta, 'friendly');
+    await falarAvatar(avatarId, userMsg, { emotion: 'friendly', updateBubble: true });
   } catch (error) {
-    console.warn('Falha no TTS do avatar:', error);
+    console.warn('Falha no backend/TTS do avatar:', error);
+    renderAssistantMessage('Não consegui consultar o backend agora. Verifique a URL do Render, o CORS e se o deploy com text_response/visemes está ativo.');
+    startIdleAvatarMotion();
   }
 
   if (selectedAvatarIndex !== 0) {
     interactionCount++;
     if (interactionCount >= 5) {
       setTimeout(() => {
-        saudacaoMsg.textContent = "Esta foi uma demonstração rápida. A Sofia pode explicar como isso funcionaria no seu site! 😊";
+        saudacaoMsg.textContent = 'Esta foi uma demonstração rápida. A Sofia pode explicar como isso funcionaria no seu site! 😊';
         perguntasLista.innerHTML = '';
         const btnVoltar = document.createElement('div');
         btnVoltar.className = 'pergunta-item';
@@ -1258,15 +1545,16 @@ async function handleInteraction() {
         perguntasLista.appendChild(btnVoltar);
         perguntasBox.classList.add('visivel');
         if (autoReturnTimer) clearTimeout(autoReturnTimer);
-        autoReturnTimer = setTimeout(() => {
-          ctaModeActive = false; updateSelectedAvatar(0);
-        }, 15000);
+        autoReturnTimer = setTimeout(() => { ctaModeActive = false; updateSelectedAvatar(0); }, 15000);
       }, 2000);
     } else resetAutoReturnTimer();
   }
 }
 
+setupContextTracking();
+
 // RENDERIZAR THUMBNAILS
+
 avatars.forEach((avatar, index) => {
   const btn = document.createElement('button');
   btn.className = `thumbnail-btn ${index === 0 ? 'selected' : ''}`;
