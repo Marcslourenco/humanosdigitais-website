@@ -1244,7 +1244,11 @@ function buildSpeechMeta(responseData, fallbackText, avatarId) {
 
 function attachAudioLifecycle(audio, speechMeta) {
   if (!audio || !speechMeta) return;
-  audio.addEventListener('play', () => startAvatarSpeechAnimation(speechMeta.visemeFrames));
+  console.log('[DEBUG] attachAudioLifecycle - visemeFrames:', speechMeta.visemeFrames);
+  audio.addEventListener('play', () => {
+    console.log('[DEBUG] Audio play event - applying visemes:', speechMeta.visemeFrames);
+    startAvatarSpeechAnimation(speechMeta.visemeFrames);
+  });
   audio.addEventListener('ended', () => {
     if (window.__hdCurrentAudio === audio) window.__hdCurrentAudio = null;
     stopAvatarSpeechAnimation(true);
@@ -1285,6 +1289,7 @@ async function retryPendingAudio() {
   const pending = window.__hdPendingAudioBase64;
   const mime = window.__hdPendingAudioMime || 'audio/mp3';
   const speechMeta = window.__hdPendingSpeechMeta || null;
+  console.log('[DEBUG] retryPendingAudio - speechMeta:', speechMeta);
   try {
     await playBase64Audio(pending, mime, speechMeta);
   } catch (error) {
