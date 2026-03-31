@@ -945,6 +945,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 <script>
 // ========== BACKEND TTS ==========
 // Backend TTS com HTTPS nativo no Render
+// FORCE REBUILD: 2026-03-31 22:00:00 - Clearing Vercel cache
 window.HD_BACKEND_URL = 'https://humanos-digitais-tts-v2.onrender.com';
 window._hdSessionId = localStorage.getItem('hd_session_id') || (() => { const id = 'sess_' + Math.random().toString(36).slice(2, 11); localStorage.setItem('hd_session_id', id); return id; })();
 // Vercel Force Rebuild: 2026-03-31 21:45:30 CACHE_BUST_v7_final
