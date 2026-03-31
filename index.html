@@ -1256,7 +1256,7 @@ function attachAudioLifecycle(audio, speechMeta) {
 }
 
 async function playBase64Audio(audioBase64, mimeType = 'audio/mp3', speechMeta = null) {
-  if (!audioBase64 || audioBase64.length < 100) throw new Error('audio_base64 ausente ou muito curto');
+  if (!audioBase64 || audioBase64.length < 100) throw new Error('audio_data ausente ou muito curto');
   stopCurrentAudio();
   stopAvatarSpeechAnimation(false);
   const audio = new Audio(`data:${mimeType};base64,${audioBase64}`);
@@ -1344,7 +1344,7 @@ async function requestAvatarSpeech(avatarId, texto, emotion = 'friendly') {
     throw new Error('Resposta inválida do backend TTS');
   }
   if (!response.ok) throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
-  if (!data?.audio_base64) throw new Error('Backend não retornou audio_base64');
+  if (!data?.audio_data) throw new Error('Backend não retornou audio_data');
   return data;
 }
 
@@ -1363,7 +1363,7 @@ async function falarAvatar(avatarId, texto, optionsOrEmotion = 'friendly') {
   data.render_text = speechMeta.renderText;
   data.viseme_frames = speechMeta.visemeFrames;
   data.context_url_sent = getCurrentContextUrl();
-  await playBase64Audio(data.audio_base64, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3', speechMeta);
+  await playBase64Audio(data.audio_data, data.audio_format === 'mp3' ? 'audio/mp3' : 'audio/mp3', speechMeta);
   return data;
 }
 
