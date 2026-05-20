@@ -1243,7 +1243,14 @@ function buildSpeechMeta(responseData, fallbackText, avatarId) {
 }
 
 function attachAudioLifecycle(audio, speechMeta) {
-  if (!audio || !speechMeta) return;
+  // GUARDA CRÍTICA: não processa visemes se áudio bloqueado
+  // Evita o delay causado por fila de animação travada
+  if (!window.hdAudioUnlocked || !audio || !speechMeta) {
+    if (!window.hdAudioUnlocked) {
+      console.warn("🔇 Áudio não desbloqueado. Visemas ignorados.");
+    }
+    return;
+  }
   console.log('[DEBUG] attachAudioLifecycle - visemeFrames:', speechMeta.visemeFrames);
   audio.addEventListener('play', () => {
     console.log('[DEBUG] Audio play event - applying visemes:', speechMeta.visemeFrames);
@@ -1257,6 +1264,24 @@ function attachAudioLifecycle(audio, speechMeta) {
     if (audio.ended) return;
     stopAvatarSpeechAnimation(true);
   });
+}
+
+// Desbloqueia AudioContext (requerido pelo navegador para autoplay)
+async function unlockAudioContext() {
+  if (window.hdAudioUnlocked) return true;
+  
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+    window.hdAudioUnlocked = true;
+    console.log('[AUDIO] AudioContext desbloqueado');
+    return true;
+  } catch (error) {
+    console.warn('[AUDIO] Falha ao desbloquear AudioContext:', error);
+    return false;
+  }
 }
 
 async function playBase64Audio(audioBase64, mimeType = 'audio/mp3', speechMeta = null) {
@@ -1326,30 +1351,41 @@ function normalizeVisemeFrames(data, text, durationMs) {
   return generateMockVisemesFromText(text, durationMs);
 }
 
-async function requestAvatarSpeech(avatarId, texto, emotion = 'friendly') {
+async function requestAvatarSpeech(avatarId, texto, eventType = 'query') {
   const cleanAvatarId = getAvatarIdFromName(avatarId);
   const cleanText = sanitizeSpeechText(texto);
   if (!cleanAvatarId) throw new Error('avatarId inválido');
-  if (!cleanText) throw new Error('Texto vazio para TTS');
+  
+  // Detecta automaticamente: texto vazio = intro, texto presente = query
+  const resolvedEventType = (!cleanText || cleanText.trim() === '') 
+    ? 'intro' 
+    : (eventType || 'query');
+  
   const response = await fetch(getBackendSpeakUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       avatar_id: cleanAvatarId,
-      text: cleanText,
-      emotion: emotion || 'friendly',
-      session_id: window._hdSessionId || 'default',
-      context_url: getCurrentContextUrl()
+      text: cleanText || '',
+      event_type: resolvedEventType,
+      language: 'pt-BR',
+      session_id: window._hdSessionId || 'default'
     })
   });
+  
   let data = null;
   try {
     data = await response.json();
   } catch (error) {
     throw new Error('Resposta inválida do backend TTS');
   }
-  if (!response.ok) throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
-  if (!data?.audio_data) throw new Error('Backend não retornou audio_data');
+  
+  if (!response.ok) {
+    throw new Error(data?.detail || `Falha no backend TTS (${response.status})`);
+  }
+  if (!data?.audio_data) {
+    throw new Error('Backend não retornou audio_data');
+  }
   return data;
 }
 
@@ -1362,7 +1398,7 @@ async function falarAvatar(avatarId, texto, optionsOrEmotion = 'friendly') {
   const options = normalizeSpeechOptions(optionsOrEmotion);
   const cleanAvatarId = getAvatarIdFromName(avatarId);
   const cleanText = sanitizeSpeechText(texto);
-  const data = await requestAvatarSpeech(cleanAvatarId, cleanText, options.emotion || 'friendly');
+  const data = await requestAvatarSpeech(cleanAvatarId, cleanText, 'query');
   const speechMeta = buildSpeechMeta(data, cleanText, cleanAvatarId);
   if (options.updateBubble !== false) renderAssistantMessage(speechMeta.renderText);
   data.render_text = speechMeta.renderText;
@@ -1485,6 +1521,13 @@ function updateSelectedAvatar(index) {
     floatAvatarPlaceholder.style.background = avatar.color;
   }
 
+  // Desbloquear áudio no clique do avatar (clique do usuário)
+  unlockAudioContext().then(unlocked => {
+    if (unlocked && !ctaModeActive) {
+      saudarAvatar(getAvatarIdFromName(avatar.name)).catch(e => console.warn('Saudação falhou:', e));
+    }
+  });
+  
   if (!ctaModeActive) { saudacaoMsg.textContent = avatar.saudacao; limparQuickReplies(); }
   mostrarPerguntasMainArea(avatar);
 
