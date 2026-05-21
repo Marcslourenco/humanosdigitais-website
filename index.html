@@ -943,6 +943,14 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
 
 <!-- VERCEL FORCE REBUILD: 2026-03-24T18:05:00Z -->
 <script>
+// ============================================
+// CONTROLE DE ÁUDIO — resolve autoplay policy
+// e fila de visemes travada
+// ============================================
+window.hdAudioUnlocked = false;
+window.hdPendingGreeting = null;
+window.hdGreetingInProgress = false; // evita múltiplas filas
+
 // ========== BACKEND TTS ==========
 // Backend TTS com HTTPS nativo no Render
 // FORCE REBUILD: 2026-03-31 22:00:00 - Clearing Vercel cache
@@ -1285,6 +1293,13 @@ async function unlockAudioContext() {
 }
 
 async function playBase64Audio(audioBase64, mimeType = 'audio/mp3', speechMeta = null) {
+  // Guarda: não processa se áudio não desbloqueado
+  if (!window.hdAudioUnlocked) {
+    console.warn("🔇 Áudio bloqueado. Aguardando interação do usuário.");
+    // Armazena para retry quando usuário clicar
+    window.hdPendingGreeting = { audioBase64, mimeType, speechMeta };
+    return;
+  }
   if (!audioBase64 || audioBase64.length < 100) throw new Error('audio_data ausente ou muito curto');
   stopCurrentAudio();
   stopAvatarSpeechAnimation(false);
@@ -1390,8 +1405,19 @@ async function requestAvatarSpeech(avatarId, texto, eventType = 'query') {
 }
 
 function normalizeSpeechOptions(optionsOrEmotion) {
-  if (typeof optionsOrEmotion === 'string') return { emotion: optionsOrEmotion };
-  return optionsOrEmotion || {};
+  if (typeof optionsOrEmotion === 'string') {
+    // Mapeia strings legadas para event_type correto
+    const eventType = (optionsOrEmotion === 'intro') ? 'intro' : 'query';
+    return { event_type: eventType };
+  }
+  if (optionsOrEmotion && typeof optionsOrEmotion === 'object') {
+    // Garante que event_type está presente
+    if (!optionsOrEmotion.event_type) {
+      optionsOrEmotion.event_type = 'query'; // default seguro
+    }
+    return optionsOrEmotion;
+  }
+  return { event_type: 'query' };
 }
 
 async function falarAvatar(avatarId, texto, optionsOrEmotion = 'friendly') {
@@ -1412,7 +1438,7 @@ async function saudarAvatar(avatarId) {
   const cleanAvatarId = getAvatarIdFromName(avatarId);
   const avatar = avatars.find((item) => getAvatarIdFromName(item.name) === cleanAvatarId);
   if (!avatar) throw new Error(`Avatar não encontrado: ${avatarId}`);
-  return falarAvatar(cleanAvatarId, avatar.saudacao, { emotion: 'friendly', updateBubble: true });
+  return falarAvatar(cleanAvatarId, avatar.saudacao, { event_type: 'intro', updateBubble: true });
 }
 
 window.falarAvatar = falarAvatar;
@@ -1521,12 +1547,33 @@ function updateSelectedAvatar(index) {
     floatAvatarPlaceholder.style.background = avatar.color;
   }
 
-  // Desbloquear áudio no clique do avatar (clique do usuário)
-  unlockAudioContext().then(unlocked => {
-    if (unlocked && !ctaModeActive) {
-      saudarAvatar(getAvatarIdFromName(avatar.name)).catch(e => console.warn('Saudação falhou:', e));
+  // Evita múltiplas saudções simultâneas
+  if (window.hdGreetingInProgress) {
+    console.log("⏳ Saudção em andamento, ignorando.");
+    return;
+  }
+  
+  // Desbloquear áudio NO CLIQUE DO USUÁRIO (não no load)
+  if (!window.hdAudioUnlocked) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      await ctx.resume();
+      window.hdAudioUnlocked = true;
+      console.log("✅ AudioContext desbloqueado pelo clique no avatar");
+    } catch(e) {
+      console.warn("⚠️ Falha no AudioContext:", e);
     }
-  });
+  }
+  
+  // Disparar saudção APENAS após desbloqueio e se não há outra em andamento
+  if (window.hdAudioUnlocked && !window.hdGreetingInProgress && !ctaModeActive) {
+    window.hdGreetingInProgress = true;
+    try {
+      await saudarAvatar(getAvatarIdFromName(avatar.name));
+    } finally {
+      window.hdGreetingInProgress = false;
+    }
+  }
   
   if (!ctaModeActive) { saudacaoMsg.textContent = avatar.saudacao; limparQuickReplies(); }
   mostrarPerguntasMainArea(avatar);
@@ -1542,17 +1589,7 @@ function updateSelectedAvatar(index) {
   resetAutoReturnTimer();
   startIdleAvatarMotion();
 
-  const avatarIdTTS = getAvatarIdFromName(avatar.name);
-  setTimeout(async () => {
-    try {
-      setAssistantLoading(`🎤 ${avatar.name} está se preparando para responder...`);
-      await saudarAvatar(avatarIdTTS);
-    } catch (error) {
-      console.warn('Falha ao tocar saudação do avatar.', error);
-      saudacaoMsg.textContent = avatar.saudacao;
-      startIdleAvatarMotion();
-    }
-  }, 300);
+  // Removido: saudarAvatar automática no setTimeout (causava multi-fila)
 }
 
 async function handleInteraction() {
@@ -1574,7 +1611,7 @@ async function handleInteraction() {
   const av = avatars[selectedAvatarIndex];
   const avatarId = getAvatarIdFromName(av.name);
   try {
-    await falarAvatar(avatarId, userMsg, { emotion: 'friendly', updateBubble: true });
+    await falarAvatar(avatarId, userMsg, { event_type: 'query', updateBubble: true });
   } catch (error) {
     console.warn('Falha no backend/TTS do avatar:', error);
     renderAssistantMessage('Não consegui consultar o backend agora. Verifique a URL do Render, o CORS e se o deploy com text_response/visemes está ativo.');
