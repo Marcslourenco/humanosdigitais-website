@@ -1102,7 +1102,10 @@ function applyAvatarViseme(visemeName, options = {}) {
   const open = (style.open * idleFactor).toFixed(3);
   const width = (1 + ((style.width || 1) - 1) * idleFactor).toFixed(3);
   const opacity = (Math.max(0.08, (style.opacity || 0.10) * idleFactor)).toFixed(3);
-  const shiftY = `${(-2.4 * style.open * idleFactor).toFixed(2)}px`;
+  // FIX: Remover shift vertical para evitar tremor no pescoço
+  // O shift causava movimento de TODO o avatar, não apenas da boca
+  // const shiftY = `${(-2.4 * style.open * idleFactor).toFixed(2)}px`;
+  const shiftY = '0px'; // Apenas boca se move, não o pescoço
   const scale = (1 + style.open * 0.012 * idleFactor).toFixed(3);
   floatAvatarPlaceholder.dataset.viseme = viseme.toLowerCase();
   floatAvatarPlaceholder.style.setProperty('--mouth-open', open);
